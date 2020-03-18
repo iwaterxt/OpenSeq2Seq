@@ -69,7 +69,7 @@ def _convert_audio_and_sentences(source_dir):
   	for line in fin:
   		line = line.strip().split()
   		wav_filesize = os.path.getsize(str(line[1]))
-  		files.append(str(line[1]), wav_filesize, utt2trans[line[0]])
+  		files.append((str(line[1]), wav_filesize, utt2trans[line[0]]))
 
   return pandas.DataFrame(data=files, columns=["wav_filename", "wav_filesize", "transcript"])
 
@@ -98,7 +98,7 @@ def _convert_feat_and_sentences(source_dir):
   	for line in fin:
   		line = line.split().strip()
   		feats_filesize = os.path.getsize(str(line[1]))
-  		files.append(str(line[1]), feats_filesize, utt2trans[line[0]])
+  		files.append((str(line[1]), feats_filesize, utt2trans[line[0]]))
 
   return pandas.DataFrame(data=files, columns=["feats_filename", "feats_filesize", "transcript"])
 
