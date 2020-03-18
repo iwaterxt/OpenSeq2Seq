@@ -39,9 +39,9 @@ def preprocess_data(data_dir):
 		bar.update(1)
 	# Write sets to disk as CSV files
 	train_dir = os.path.join(data_dir, 'train')
-  	train.to_csv(os.path.join(train_dir, "librivox-train.csv"), index=False)
-  	dev_dir = os.path.join(data_dir, 'dev')
-  	dev.to_csv(os.path.join(dev_dir, "librivox-dev.csv"), index=False)
+	train.to_csv(os.path.join(train_dir, "librivox-train.csv"), index=False)
+	dev_dir = os.path.join(data_dir, 'dev')
+	dev.to_csv(os.path.join(dev_dir, "librivox-dev.csv"), index=False)
 
 
 def _convert_audio_and_sentences(source_dir):
