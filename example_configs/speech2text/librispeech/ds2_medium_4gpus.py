@@ -13,7 +13,7 @@ base_params = {
   "random_seed": 0,
   "use_horovod": False,
   "num_gpus": 4,
-  "batch_size_per_gpu": 32,
+  "batch_size_per_gpu": 24,
 
   "num_epochs": 50,
 
@@ -22,7 +22,7 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn500/base_000",
+  "logdir": "experiments/ds2/base_000",
 
   "optimizer": "Adam",
   "lr_policy": poly_decay,
@@ -62,7 +62,7 @@ base_params = {
 
     "use_cudnn_rnn": True,
     "rnn_type": "cudnn_gru",
-    "rnn_unidirectional": True,
+    "rnn_unidirectional": False,
 
     "row_conv": True,
     "row_conv_width": 8,
@@ -86,7 +86,7 @@ base_params = {
     "decoder_library_path": "ctc_decoder_with_lm/libctc_decoder_with_kenlm.so",
     "lm_path": "language_model/4-gram.binary",
     "trie_path": "language_model/trie.binary",
-    "alphabet_config_path": "data/baseline_chn_500/dict/vocab.txt",
+    "alphabet_config_path": "open_seq2seq/test_utils/toy_speech_data/vocab.txt",
   },
   "loss": CTCLoss,
   "loss_params": {},
@@ -100,11 +100,14 @@ train_params = {
     "augmentation": {'time_stretch_ratio': 0.05,
                      'noise_level_min': -90,
                      'noise_level_max': -60},
-    "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
+    "vocab_file": "open_seq2seq/test_utils/toy_speech_data/vocab.txt",
     "dataset_files": [
-      "data/baseline_chn_500/train/librivox-train.csv"
+      "data/librispeech/librivox-train-clean-100.csv",
+      "data/librispeech/librivox-train-clean-360.csv",
+      "data/librispeech/librivox-train-other-500.csv"
     ],
     "shuffle": True,
+    "bpe": True
   },
 }
 
@@ -113,10 +116,11 @@ eval_params = {
   "data_layer_params": {
     "num_audio_features": 160,
     "input_type": "spectrogram",
-    "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
+    "vocab_file": "open_seq2seq/test_utils/toy_speech_data/vocab.txt",
     "dataset_files": [
-      "data/baseline_chn_500/dev/librivox-dev.csv"
+      "data/librispeech/librivox-dev-clean.csv"
     ],
     "shuffle": False,
+    "bpe": True
   },
 }
