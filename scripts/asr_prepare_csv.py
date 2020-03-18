@@ -32,15 +32,16 @@ from tensorflow.python.platform import gfile
 
 def preprocess_data(data_dir):
 	print("Converting WAV and transcriptions...")
+	train_dir = os.path.join(data_dir, 'train')
+	dev_dir = os.path.join(data_dir, 'dev')
 	with tqdm.tqdm(total=2) as bar:
-		train = _convert_audio_and_sentences(data_dir, 'train')
+		train = _convert_audio_and_sentences(train_dir)
 		bar.update(1)
-		dev = _convert_audio_and_sentences(data_dir, 'dev')
+		dev = _convert_audio_and_sentences(dev_dir)
 		bar.update(1)
 	# Write sets to disk as CSV files
-	train_dir = os.path.join(data_dir, 'train')
 	train.to_csv(os.path.join(train_dir, "librivox-train.csv"), index=False)
-	dev_dir = os.path.join(data_dir, 'dev')
+	
 	dev.to_csv(os.path.join(dev_dir, "librivox-dev.csv"), index=False)
 
 
