@@ -55,7 +55,7 @@ def _convert_audio_and_sentences(source_dir):
   	sys.exit(1)
 
   text_file = os.path.join(source_dir, "text")
-  if not os.path.exists(text_file)
+  if not os.path.exists(text_file):
   	print ("not exists text file!")
   	sys.exit(1)
 
@@ -85,7 +85,7 @@ def _convert_feat_and_sentences(source_dir):
 
 
   text_file = os.path.join(source_dir, "text")
-  if not os.path.exists(text_file)
+  if not os.path.exists(text_file):
   	print ("not exists text file !")
   	sys.exit(1)
   with codecs.open(text_file, "r", "utf-8") as fin:
