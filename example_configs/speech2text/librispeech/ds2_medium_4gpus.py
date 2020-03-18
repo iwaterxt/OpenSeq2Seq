@@ -86,7 +86,7 @@ base_params = {
     "decoder_library_path": "ctc_decoder_with_lm/libctc_decoder_with_kenlm.so",
     "lm_path": "language_model/4-gram.binary",
     "trie_path": "language_model/trie.binary",
-    "alphabet_config_path": "open_seq2seq/test_utils/toy_speech_data/vocab.txt",
+    "alphabet_config_path": "data/librispeech/dict/train_bpe30000.model",
   },
   "loss": CTCLoss,
   "loss_params": {},
@@ -100,7 +100,7 @@ train_params = {
     "augmentation": {'time_stretch_ratio': 0.05,
                      'noise_level_min': -90,
                      'noise_level_max': -60},
-    "vocab_file": "open_seq2seq/test_utils/toy_speech_data/vocab.txt",
+    "vocab_file": "data/librispeech/dict/train_bpe30000.model",
     "dataset_files": [
       "data/librispeech/librivox-train-clean-100.csv",
       "data/librispeech/librivox-train-clean-360.csv",
@@ -116,7 +116,7 @@ eval_params = {
   "data_layer_params": {
     "num_audio_features": 160,
     "input_type": "spectrogram",
-    "vocab_file": "open_seq2seq/test_utils/toy_speech_data/vocab.txt",
+    "vocab_file": "data/librispeech/dict/train_bpe30000.model",
     "dataset_files": [
       "data/librispeech/librivox-dev-clean.csv"
     ],
