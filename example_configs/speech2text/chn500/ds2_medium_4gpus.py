@@ -100,6 +100,7 @@ train_params = {
     "augmentation": {'time_stretch_ratio': 0.05,
                      'noise_level_min': -90,
                      'noise_level_max': -60},
+    "bpe": True,
     "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
     "dataset_files": [
       "data/baseline_chn_500/train/librivox-train.csv"
@@ -114,6 +115,7 @@ eval_params = {
     "num_audio_features": 160,
     "input_type": "spectrogram",
     "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
+    "bpe": True,
     "dataset_files": [
       "data/baseline_chn_500/dev/librivox-dev.csv"
     ],
