@@ -12,8 +12,8 @@ base_model = Speech2Text
 base_params = {
   "random_seed": 0,
   "use_horovod": False,
-  "num_gpus": 4,
-  "batch_size_per_gpu": 24,
+  "num_gpus": 2,
+  "batch_size_per_gpu": 32,
 
   "num_epochs": 50,
 
