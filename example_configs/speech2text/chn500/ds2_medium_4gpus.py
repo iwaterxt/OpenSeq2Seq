@@ -22,7 +22,7 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/ds2/base_000",
+  "logdir": "experiments/chn500/base_000",
 
   "optimizer": "Adam",
   "lr_policy": poly_decay,
