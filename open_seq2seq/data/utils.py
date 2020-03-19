@@ -63,4 +63,5 @@ def load_pre_existing_vocabulary(path, min_idx=0, read_chars=False):
       idx += 1
       print (idx)
   print (path)
+  print (len(vocab_dict))
   return vocab_dict
