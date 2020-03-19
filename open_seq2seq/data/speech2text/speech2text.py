@@ -125,6 +125,9 @@ class Speech2TextDataLayer(DataLayer):
         self.params['tgt_vocab_size'] = len(self.params['char2idx']) + 1
       else:
         num_chars_orig = len(self.params['char2idx'])
+        print ("===================================")
+        print (num_chars_origm)
+        print ("===================================")
         self.params['tgt_vocab_size'] = num_chars_orig + 2
         self.start_index = num_chars_orig
         self.end_index = num_chars_orig + 1
