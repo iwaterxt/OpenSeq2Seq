@@ -49,6 +49,7 @@ def load_pre_existing_vocabulary(path, min_idx=0, read_chars=False):
   """
   idx = min_idx
   vocab_dict = {}
+
   with io.open(path, newline='', encoding='utf-8') as f:
     for line in f:
       # ignoring empty lines
@@ -60,4 +61,6 @@ def load_pre_existing_vocabulary(path, min_idx=0, read_chars=False):
         token = line.rstrip().split('\t')[0]
       vocab_dict[token] = idx
       idx += 1
+      print (idx)
+  print (path)
   return vocab_dict
