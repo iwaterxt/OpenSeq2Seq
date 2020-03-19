@@ -82,7 +82,7 @@ base_params = {
     "beam_width": 512,
     "alpha": 2.0,
     "beta": 1.0,
-
+    "tgt_vocab_size": 7531,
     "decoder_library_path": "ctc_decoder_with_lm/libctc_decoder_with_kenlm.so",
     "lm_path": "language_model/4-gram.binary",
     "trie_path": "language_model/trie.binary",

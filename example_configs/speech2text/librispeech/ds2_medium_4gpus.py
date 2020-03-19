@@ -13,7 +13,7 @@ base_params = {
   "random_seed": 0,
   "use_horovod": False,
   "num_gpus": 4,
-  "batch_size_per_gpu": 24,
+  "batch_size_per_gpu": 10,
 
   "num_epochs": 50,
 
@@ -57,7 +57,7 @@ base_params = {
         "num_channels": 96, "padding": "SAME"
       },
     ],
-    "num_rnn_layers": 3,
+    "num_rnn_layers": 1,
     "rnn_cell_dim": 1024,
 
     "use_cudnn_rnn": True,
@@ -67,7 +67,7 @@ base_params = {
     "row_conv": True,
     "row_conv_width": 8,
 
-    "n_hidden": 2048,
+    "n_hidden": 1024,
 
     "dropout_keep_prob": 0.5,
     "activation_fn": tf.nn.relu,
