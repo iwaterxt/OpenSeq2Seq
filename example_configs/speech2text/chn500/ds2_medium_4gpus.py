@@ -104,11 +104,24 @@ train_params = {
     "dataset_files": [
       "data/baseline_chn_500/train/librivox-train.csv"
     ],
-    "shuffle": True,
+    "shuffle": False,
   },
 }
 
 eval_params = {
+  "data_layer": Speech2TextDataLayer,
+  "data_layer_params": {
+    "num_audio_features": 160,
+    "input_type": "spectrogram",
+    "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
+    "dataset_files": [
+      "data/baseline_chn_500/dev/librivox-dev.csv"
+    ],
+    "shuffle": False,
+  },
+}
+
+infer_params = {
   "data_layer": Speech2TextDataLayer,
   "data_layer_params": {
     "num_audio_features": 160,

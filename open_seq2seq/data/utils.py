@@ -1,4 +1,5 @@
 # Copyright (c) 2017 NVIDIA Corporation
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
@@ -56,12 +57,9 @@ def load_pre_existing_vocabulary(path, min_idx=0, read_chars=False):
       if not line or line == '\n':
         continue
       if read_chars:
-        token = line[0]
+        token = "".join(line[0:-1])
       else:
         token = line.rstrip().split('\t')[0]
       vocab_dict[token] = idx
       idx += 1
-      print (idx)
-  print (path)
-  print (len(vocab_dict))
   return vocab_dict

@@ -415,7 +415,7 @@ class Speech2TextDataLayer(DataLayer):
     if self.params['bpe']:
       target_indices = self.sp.EncodeAsIds(transcript)
     else:
-      target_indices = [self.params['char2idx'][c] for c in transcript]
+      target_indices = [self.params['char2idx'][c] for c in str(transcript).split()]
     if self.autoregressive:
       target_indices = target_indices + [self.end_index]
     target = np.array(target_indices)
