@@ -29,7 +29,7 @@ def main(pickle_file, ark_file):
 			first_col = np.copy(mat[:,0])
 			end_col = np.copy(mat[:, l-1])
 			mat[:,l-1] = first_col
-			mat[;,0] = end_col
+			mat[:,0] = end_col
 			kaldi_io.write_mat(f, np.log(softmax(mat)), key=key)
 
 
