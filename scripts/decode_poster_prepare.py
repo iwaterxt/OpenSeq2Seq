@@ -21,7 +21,7 @@ def softmax(x):
   return e / np.expand_dims(e.sum(axis=-1), -1)
 
 def main(pickle_file, ark_file):
-	data = load_dump(logits)
+	data = load_dump(pickle_file)
 	poster_dict = get_logits(data)
 	with open(ark_file,'wb') as f:
 		for key,mat in poster_dict.iteritems():
