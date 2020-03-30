@@ -24,7 +24,7 @@ def main(pickle_file, ark_file):
 	data = load_dump(pickle_file)
 	poster_dict = get_logits(data)
 	with open(ark_file,'wb') as f:
-		for key,mat in poster_dict.iteritems():
+		for key,mat in poster_dict.items():
 			r,l = mat.shape()
 			first_col = np.copy(mat[:,0])
 			end_col = np.copy(mat[:, l-1])
