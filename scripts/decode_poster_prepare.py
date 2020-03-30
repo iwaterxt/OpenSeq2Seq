@@ -26,11 +26,9 @@ def main(pickle_file, ark_file):
 	with open(ark_file,'wb') as f:
 		for key,mat in poster_dict.items():
 			r,l = mat.shape
-			first_col = np.copy(mat[:,0])
 			end_col = np.copy(mat[:, l-1])
-			mat[:,l-1] = first_col
-			mat[:,0] = end_col
-			kaldi_io.write_mat(f, np.log(softmax(mat)), key=key)
+			mat_new = np.hstack((end_col, mat[:, 0:l-2]))
+			kaldi_io.write_mat(f, np.log(softmax(mat_new)), key=key)
 
 
 if __name__ == "__main__":
