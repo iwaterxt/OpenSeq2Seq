@@ -22,12 +22,16 @@ import tqdm
 import subprocess
 import tarfile
 import unicodedata
-
+import argparse
 from sox import Transformer
 import urllib
 from tensorflow.python.platform import gfile
 
 
+
+parser = argparse.ArgumentParser(description="convert wav or feat to csv ")
+parser.add_argument("--data-format", type=str, default="wav", help="[wav feat] data format for training")
+args = parser.parse_args()
 
 
 def preprocess_data(data_dir):
@@ -35,10 +39,16 @@ def preprocess_data(data_dir):
 	train_dir = os.path.join(data_dir, 'train')
 	dev_dir = os.path.join(data_dir, 'dev')
 	with tqdm.tqdm(total=2) as bar:
-		train = _convert_audio_and_sentences(train_dir)
-		bar.update(1)
-		dev = _convert_audio_and_sentences(dev_dir)
-		bar.update(1)
+    if args.data_format == "wav"
+		  train = _convert_audio_and_sentences(train_dir)
+		  bar.update(1)
+		  dev = _convert_audio_and_sentences(dev_dir)
+		  bar.update(1)
+    else:
+      train = _convert_feat_and_sentences(train_dir)
+      bar.update(1)
+      dev = _convert_feat_and_sentences(dev_dir)
+      bar.update(1)
 	# Write sets to disk as CSV files
 	train.to_csv(os.path.join(train_dir, "librivox-train.csv"), index=False)
 	
@@ -78,17 +88,17 @@ def _convert_feat_and_sentences(source_dir):
 
   files = []
   utt2trans = {}
-  feats_scp = os.path.join(source_dir, "feats.scp")
 
+  feats_scp = os.path.join(source_dir, "feats.scp")
   if not os.path.exists(feats_scp):
   	print (" not exists feats.scp file!")
   	sys.exit(1)
-
 
   text_file = os.path.join(source_dir, "text")
   if not os.path.exists(text_file):
   	print ("not exists text file !")
   	sys.exit(1)
+
   with codecs.open(text_file, "r", "utf-8") as fin:
   	for line in fin:
   		line = line.split().strip()
@@ -97,7 +107,7 @@ def _convert_feat_and_sentences(source_dir):
   with codecs.open(feats_scp, "r", "utf-8") as fin:
   	for line in fin:
   		line = line.split().strip()
-  		feats_filesize = os.path.getsize(str(line[1]))
+  		feats_filesize = 0
   		files.append((str(line[1]), feats_filesize, utt2trans[line[0]]))
 
   return pandas.DataFrame(data=files, columns=["feats_filename", "feats_filesize", "transcript"])
