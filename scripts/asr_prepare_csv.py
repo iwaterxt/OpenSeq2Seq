@@ -30,7 +30,7 @@ from tensorflow.python.platform import gfile
 
 
 parser = argparse.ArgumentParser(description="convert wav or feat to csv ")
-parser.add_argument("--data-format", type=str, default="wav", help="[wav feat] data format for training")
+parser.add_argument("--data_format", type=str, default="wav", help="[wav feat] data format for training")
 args = parser.parse_args()
 
 
