@@ -111,7 +111,7 @@ def _convert_feat_and_sentences(source_dir):
   		feats_filesize = 0
   		files.append((str(line[1]), feats_filesize, utt2trans[line[0]]))
 
-  return pandas.DataFrame(data=files, columns=["feats_filename", "feats_filesize", "transcript"])
+  return pandas.DataFrame(data=files, columns=["wav_filename", "wav_filesize", "transcript"])
 
 
 if __name__ == "__main__":
