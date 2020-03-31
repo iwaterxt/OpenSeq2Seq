@@ -39,7 +39,7 @@ def preprocess_data(data_dir):
 	train_dir = os.path.join(data_dir, 'train')
 	dev_dir = os.path.join(data_dir, 'dev')
 	with tqdm.tqdm(total=2) as bar:
-    if args.data_format == "wav"
+    if args.data_format == "wav":
 		  train = _convert_audio_and_sentences(train_dir)
 		  bar.update(1)
 		  dev = _convert_audio_and_sentences(dev_dir)
