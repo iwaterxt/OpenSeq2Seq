@@ -473,7 +473,7 @@ class Speech2TextDataLayer(DataLayer):
     feat_filename, transcript = element
     if not six.PY2:
       transcript = str(transcript, 'utf-8')
-      audio_filename = str(audio_filename, 'utf-8')
+      feat_filename = str(feat_filename, 'utf-8')
     if self.params['bpe']:
       target_indices = self.sp.EncodeAsIds(transcript)
     else:
@@ -486,7 +486,7 @@ class Speech2TextDataLayer(DataLayer):
     target = np.array(target_indices)
 
     if self.params.get("syn_enable", False):
-      audio_filename = audio_filename.format(np.random.choice(self.params["syn_subdirs"]))
+      feat_filename = feat_filename.format(np.random.choice(self.params["syn_subdirs"]))
     source, duration = load_speech_features_from_file(
         feat_filename,
         params=self.params
