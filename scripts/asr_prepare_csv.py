@@ -102,12 +102,12 @@ def _convert_feat_and_sentences(source_dir):
 
   with codecs.open(text_file, "r", "utf-8") as fin:
   	for line in fin:
-  		line = line.split().strip()
+  		line = line.strip().split()
   		utt2trans[line[0]] = " ".join(line[1:])
 
   with codecs.open(feats_scp, "r", "utf-8") as fin:
   	for line in fin:
-  		line = line.split().strip()
+  		line = line.strip().split()
   		feats_filesize = 0
   		files.append((str(line[1]), feats_filesize, utt2trans[line[0]]))
 
