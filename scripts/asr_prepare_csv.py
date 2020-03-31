@@ -32,13 +32,15 @@ from tensorflow.python.platform import gfile
 parser = argparse.ArgumentParser(description="convert wav or feat to csv ")
 parser.add_argument("--data_format", type=str, default="wav", help="[wav feat] data format for training")
 parser.add_argument("--data_dir", type=str, default="", help="data dir where store feats or wavs")
+parser.add_argument("--data_tr_dir", type=str, default="", help="data dir where contain train features")
+parser.add_argument("--data_dev_dir", type=str default="", help="data dir where contain dev features")
 args = parser.parse_args()
 
 
 def preprocess_data(data_dir):
     print("Converting WAV and transcriptions...")
-    train_dir = os.path.join(data_dir, 'train')
-    dev_dir = os.path.join(data_dir, 'dev')
+    train_dir = os.path.join(data_dir, args.data_tr_dir)
+    dev_dir = os.path.join(data_dir, args.data_dev_dir)
     with tqdm.tqdm(total=2) as bar:
         if args.data_format == 'wav':
           train = _convert_audio_and_sentences(train_dir)
