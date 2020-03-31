@@ -31,6 +31,7 @@ from tensorflow.python.platform import gfile
 
 parser = argparse.ArgumentParser(description="convert wav or feat to csv ")
 parser.add_argument("--data_format", type=str, default="wav", help="[wav feat] data format for training")
+parser.add_argument("--data_dir", type=str, default="", help="data dir where store feats or wavs")
 args = parser.parse_args()
 
 
@@ -114,4 +115,4 @@ def _convert_feat_and_sentences(source_dir):
 
 
 if __name__ == "__main__":
-  preprocess_data(sys.argv[1])
+  preprocess_data(args.data_dir)
