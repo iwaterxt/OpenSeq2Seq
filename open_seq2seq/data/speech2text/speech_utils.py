@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import math
 import os
 
+import kaldiio
 import h5py
 import numpy as np
 import resampy as rs
@@ -57,6 +58,9 @@ def load_features(path, data_format):
     data = np.load(path + '.npz')
     features = data['features']
     duration = data['duration']
+  elif data_format == 'kaldi':
+    features = kaldiio.load_mat(path)
+    duration = features.shape[0]*0.01
   else:
     raise ValueError("Invalid data format for caching: ", data_format, "!\n",
                      "options: hdf5, npy, npz")
@@ -212,6 +216,11 @@ def get_speech_features_from_file(filename, params):
 
   return features, duration
 
+
+def load_speech_features_from_file(filename, params):
+    cache_format = params.get('cache_format', 'kaldi')
+    features, duration = load_features(filename, data_format=cache_format)
+    return features, duration
 
 def normalize_signal(signal, gain=None):
   """

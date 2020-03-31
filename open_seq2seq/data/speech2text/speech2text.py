@@ -29,6 +29,7 @@ class Speech2TextDataLayer(DataLayer):
     return dict(DataLayer.get_required_params(), **{
         'num_audio_features': int,
         'input_type': ['spectrogram', 'mfcc', 'logfbank'],
+        'data_format': ['wav', 'feat'],
         'vocab_file': str,
         'dataset_files': list,
     })
@@ -42,6 +43,7 @@ class Speech2TextDataLayer(DataLayer):
         'max_duration': float,
         'min_duration': float,
         'bpe': bool,
+        'chn': bool,
         'autoregressive': bool,
         'syn_enable': bool,
         'syn_subdirs': list,
@@ -112,6 +114,7 @@ class Speech2TextDataLayer(DataLayer):
     self.params['autoregressive'] = self.params.get('autoregressive', False)
     self.autoregressive = self.params['autoregressive']
     self.params['bpe'] = self.params.get('bpe', False)
+    self.params['chn'] = self.params.get('chn', False)
     if self.params['bpe']:
       self.sp = spm.SentencePieceProcessor()
       self.sp.Load(self.params['vocab_file'])
@@ -226,15 +229,27 @@ class Speech2TextDataLayer(DataLayer):
           self._dataset = self._dataset.shuffle(self._size)
         self._dataset = self._dataset.repeat()
         self._dataset = self._dataset.prefetch(tf.contrib.data.AUTOTUNE)
-        self._dataset = self._dataset.map(
-            lambda line: tf.py_func(
-                self._parse_audio_transcript_element,
+        if self.params['data_format'] == 'wav':
+          self._dataset = self._dataset.map(
+              lambda line: tf.py_func(
+                  self._parse_audio_transcript_element,
+                  [line],
+                  [self.params['dtype'], tf.int32, tf.int32, tf.int32, tf.float32],
+                  stateful=False,
+              ),
+              num_parallel_calls=8,
+          )
+        else:
+          self._dataset = self._dataset.map(
+              lambda line: tf.py_func(
+                self._parse_feat_transcript_element,
                 [line],
                 [self.params['dtype'], tf.int32, tf.int32, tf.int32, tf.float32],
                 stateful=False,
-            ),
-            num_parallel_calls=8,
-        )
+              ),
+              num_parallel_calls=2,
+          )
+
         if self.params['max_duration'] > 0:
           self._dataset = self._dataset.filter(
               lambda x, x_len, y, y_len, duration:
@@ -266,15 +281,26 @@ class Speech2TextDataLayer(DataLayer):
         )
         self._dataset = self._dataset.repeat()
         self._dataset = self._dataset.prefetch(tf.contrib.data.AUTOTUNE)
-        self._dataset = self._dataset.map(
-            lambda line: tf.py_func(
-                self._parse_audio_element,
-                [line],
-                [self.params['dtype'], tf.int32, tf.int32, tf.float32],
-                stateful=False,
-            ),
-            num_parallel_calls=8,
-        )
+        if self.params['data_format'] == 'wav':
+          self._dataset = self._dataset.map(
+              lambda line: tf.py_func(
+                  self._parse_audio_element,
+                  [line],
+                  [self.params['dtype'], tf.int32, tf.int32, tf.float32],
+                  stateful=False,
+              ),
+              num_parallel_calls=8,
+          )
+        else:
+          self._dataset = self._dataset.map(
+              lambda line: tf.py_func(
+                  self._parse_feat_element,
+                  [line],
+                  [self.params['dtype'], tf.int32, tf.int32, tf.float32],
+                  stateful=False,
+              ),
+              num_parallel_calls=2,
+          )
         if self.params['max_duration'] > 0:
           self._dataset = self._dataset.filter(
               lambda x, x_len, idx, duration:
@@ -415,7 +441,10 @@ class Speech2TextDataLayer(DataLayer):
     if self.params['bpe']:
       target_indices = self.sp.EncodeAsIds(transcript)
     else:
-      target_indices = [self.params['char2idx'][c] for c in str(transcript).split()]
+      if self.params['chn']:
+        target_indices = [self.params['char2idx'][c] for c in str(transcript).split()]
+      else:
+        target_indices = [self.params['char2idx'][c] for c in transcript]
     if self.autoregressive:
       target_indices = target_indices + [self.end_index]
     target = np.array(target_indices)
@@ -432,6 +461,44 @@ class Speech2TextDataLayer(DataLayer):
         np.int32(target), \
         np.int32([len(target)]), \
         np.float32([audio_duration])
+
+  def _parse_feat_transcript_element(self, element):
+    """Parses tf.data element from TextLineDataset into feat and text.
+    Args:
+      element: tf.data element from TextLineDataset.
+    Returns:
+      tuple: source features as ``np.array``, length of source sequence,
+      target text as `np.array` of ids, target text length.
+    """
+    feat_filename, transcript = element
+    if not six.PY2:
+      transcript = str(transcript, 'utf-8')
+      audio_filename = str(audio_filename, 'utf-8')
+    if self.params['bpe']:
+      target_indices = self.sp.EncodeAsIds(transcript)
+    else:
+      if self.params['chn']:
+        target_indices = [self.params['char2idx'][c] for c in str(transcript).split()]
+      else:
+        target_indices = [self.params['char2idx'][c] for c in transcript]
+    if self.autoregressive:
+      target_indices = target_indices + [self.end_index]
+    target = np.array(target_indices)
+
+    if self.params.get("syn_enable", False):
+      audio_filename = audio_filename.format(np.random.choice(self.params["syn_subdirs"]))
+    source, duration = load_speech_features_from_file(
+        feat_filename,
+        params=self.params
+    )
+
+    return source.astype(self.params['dtype'].as_numpy_dtype()), \
+        np.int32([len(source)]), \
+        np.int32(target), \
+        np.int32([len(target)]), \
+        np.float32([duration])
+
+
 
   def _get_audio(self, wav):
     """Parses audio from wav and returns array of audio features.
@@ -467,6 +534,25 @@ class Speech2TextDataLayer(DataLayer):
     return source.astype(self.params['dtype'].as_numpy_dtype()), \
         np.int32([len(source)]), np.int32([idx]), \
         np.float32([audio_duration])
+
+  def _parse_feat_element(self, id_and_feat_filename):
+    """Parses feat from file and returns array of  features.
+    Args:
+      id_and_feat_filename: tuple of sample id and corresponding
+          feat file name.
+    Returns:
+      tuple: source features as ``np.array``, length of source sequence,
+      sample id.
+    """
+    idx, feat_filename = id_and_feat_filename
+    source, duration = load_speech_features_from_file(
+        feat_filename,
+        params=self.params
+    )
+
+    return source.astype(self.params['dtype'].as_numpy_dtype()), \
+        np.int32([len(source)]), np.int32([idx]), \
+        np.float32([duration])
 
   @property
   def input_tensors(self):
