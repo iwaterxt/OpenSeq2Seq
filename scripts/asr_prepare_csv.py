@@ -36,24 +36,24 @@ args = parser.parse_args()
 
 
 def preprocess_data(data_dir):
-	print("Converting WAV and transcriptions...")
-	train_dir = os.path.join(data_dir, 'train')
-	dev_dir = os.path.join(data_dir, 'dev')
-	with tqdm.tqdm(total=2) as bar:
-    if args.data_format == "wav":
-		  train = _convert_audio_and_sentences(train_dir)
-		  bar.update(1)
-		  dev = _convert_audio_and_sentences(dev_dir)
-		  bar.update(1)
-    else:
-      train = _convert_feat_and_sentences(train_dir)
-      bar.update(1)
-      dev = _convert_feat_and_sentences(dev_dir)
-      bar.update(1)
+    print("Converting WAV and transcriptions...")
+    train_dir = os.path.join(data_dir, 'train')
+    dev_dir = os.path.join(data_dir, 'dev')
+    with tqdm.tqdm(total=2) as bar:
+        if args.data_format == 'wav':
+          train = _convert_audio_and_sentences(train_dir)
+          bar.update(1)
+          dev = _convert_audio_and_sentences(dev_dir)
+          bar.update(1)
+        else:
+          train = _convert_feat_and_sentences(train_dir)
+          bar.update(1)
+          dev = _convert_feat_and_sentences(dev_dir)
+          bar.update(1)
 	# Write sets to disk as CSV files
-	train.to_csv(os.path.join(train_dir, "librivox-train.csv"), index=False)
+    train.to_csv(os.path.join(train_dir, "librivox-train.csv"), index=False)
 	
-	dev.to_csv(os.path.join(dev_dir, "librivox-dev.csv"), index=False)
+    dev.to_csv(os.path.join(dev_dir, "librivox-dev.csv"), index=False)
 
 
 def _convert_audio_and_sentences(source_dir):
@@ -116,3 +116,4 @@ def _convert_feat_and_sentences(source_dir):
 
 if __name__ == "__main__":
   preprocess_data(args.data_dir)
+
