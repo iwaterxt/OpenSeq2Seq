@@ -32,8 +32,8 @@ from tensorflow.python.platform import gfile
 parser = argparse.ArgumentParser(description="convert wav or feat to csv ")
 parser.add_argument("--data_format", type=str, default="wav", help="[wav feat] data format for training")
 parser.add_argument("--data_dir", type=str, default="", help="data dir where store feats or wavs")
-parser.add_argument("--data_tr_dir", type=str, default="", help="data dir where contain train features")
-parser.add_argument("--data_dev_dir", type=str default="", help="data dir where contain dev features")
+parser.add_argument("--data_tr", type=str, default="", help="data dir where contain train features")
+parser.add_argument("--data_dev", type=str, default="", help="data dir where contain dev features")
 args = parser.parse_args()
 
 
