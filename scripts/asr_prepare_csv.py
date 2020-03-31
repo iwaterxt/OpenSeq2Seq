@@ -39,8 +39,8 @@ args = parser.parse_args()
 
 def preprocess_data(data_dir):
     print("Converting WAV and transcriptions...")
-    train_dir = os.path.join(data_dir, args.data_tr_dir)
-    dev_dir = os.path.join(data_dir, args.data_dev_dir)
+    train_dir = os.path.join(data_dir, args.data_tr)
+    dev_dir = os.path.join(data_dir, args.data_dev)
     with tqdm.tqdm(total=2) as bar:
         if args.data_format == 'wav':
           train = _convert_audio_and_sentences(train_dir)
