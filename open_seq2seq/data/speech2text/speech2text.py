@@ -248,7 +248,7 @@ class Speech2TextDataLayer(DataLayer):
                 [self.params['dtype'], tf.int32, tf.int32, tf.int32, tf.float32],
                 stateful=False,
               ),
-              num_parallel_calls=2,
+              num_parallel_calls=4,
           )
 
         if self.params['max_duration'] > 0:
@@ -300,7 +300,7 @@ class Speech2TextDataLayer(DataLayer):
                   [self.params['dtype'], tf.int32, tf.int32, tf.float32],
                   stateful=False,
               ),
-              num_parallel_calls=2,
+              num_parallel_calls=4,
           )
         if self.params['max_duration'] > 0:
           self._dataset = self._dataset.filter(
