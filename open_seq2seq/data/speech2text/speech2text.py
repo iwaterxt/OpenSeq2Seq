@@ -238,7 +238,7 @@ class Speech2TextDataLayer(DataLayer):
                   [self.params['dtype'], tf.int32, tf.int32, tf.int32, tf.float32],
                   stateful=False,
               ),
-              num_parallel_calls=8,
+              num_parallel_calls=4,
           )
         else:
           self._dataset = self._dataset.map(
@@ -264,7 +264,7 @@ class Speech2TextDataLayer(DataLayer):
         self._dataset = self._dataset.map(
             lambda x, x_len, y, y_len, duration:
             [x, x_len, y, y_len],
-            num_parallel_calls=8,
+            num_parallel_calls=4,
         )
         self._dataset = self._dataset.padded_batch(
             self.params['batch_size'],
@@ -290,7 +290,7 @@ class Speech2TextDataLayer(DataLayer):
                   [self.params['dtype'], tf.int32, tf.int32, tf.float32],
                   stateful=False,
               ),
-              num_parallel_calls=8,
+              num_parallel_calls=4,
           )
         else:
           self._dataset = self._dataset.map(
@@ -315,7 +315,7 @@ class Speech2TextDataLayer(DataLayer):
         self._dataset = self._dataset.map(
             lambda x, x_len, idx, duration:
             [x, x_len, idx],
-            num_parallel_calls=16,
+            num_parallel_calls=4,
         )
         self._dataset = self._dataset.padded_batch(
             self.params['batch_size'],
