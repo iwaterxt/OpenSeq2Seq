@@ -106,6 +106,7 @@ class Speech2Text(EncoderDecoderModel):
     self.dump_outputs = self.params['decoder_params'].get('infer_logits_to_pickle', False)
 
     self.is_bpe = data_layer.params.get('bpe', False)
+    self.is_chn = data_layer.params.get('chn', False)
     self.tensor_to_chars = sparse_tensor_to_chars
     self.tensor_to_char_params = {}
     self.autoregressive = data_layer.params.get('autoregressive', False)
@@ -209,15 +210,27 @@ class Speech2Text(EncoderDecoderModel):
 
     else:
       # we also clip the sample by the correct length
-      true_text = "".join(map(
-          self.get_data_layer().params['idx2char'].get,
-          y_one_sample[:len_y_one_sample],
-      ))
-      pred_text = "".join(self.tensor_to_chars(
-          decoded_sequence_one_batch,
-          self.get_data_layer().params['idx2char'],
-          **self.tensor_to_char_params
-      )[0])
+      if self.is_chn:
+        true_text = " ".join(map(
+            self.get_data_layer().params['idx2char'].get,
+            y_one_sample[:len_y_one_sample],
+        ))
+        pred_text = " ".join(self.tensor_to_chars(
+            decoded_sequence_one_batch,
+            self.get_data_layer().params['idx2char'],
+            **self.tensor_to_char_params
+        )[0])
+      else:
+        true_text = "".join(map(
+            self.get_data_layer().params['idx2char'].get,
+            y_one_sample[:len_y_one_sample],
+        ))
+        pred_text = "".join(self.tensor_to_chars(
+            decoded_sequence_one_batch,
+            self.get_data_layer().params['idx2char'],
+            **self.tensor_to_char_params
+        )[0])
+
     sample_wer = levenshtein(true_text.split(), pred_text.split()) / \
         len(true_text.split())
 
@@ -279,9 +292,15 @@ class Speech2Text(EncoderDecoderModel):
         true_text = self.get_data_layer().sp.DecodeIds(y[:len_y].tolist())
         pred_text = self.get_data_layer().sp.DecodeIds(decoded_texts[sample_id])
       else:
-        true_text = "".join(map(self.get_data_layer().params['idx2char'].get,
-                              y[:len_y]))
-        pred_text = "".join(decoded_texts[sample_id])
+        if self.is_chn:
+          true_text = " ".join(map(self.get_data_layer().params['idx2char'].get,
+                                y[:len_y]))
+          pred_text = " ".join(decoded_texts[sample_id])
+        else:
+          true_text = "".join(map(self.get_data_layer().params['idx2char'].get,
+                                y[:len_y]))
+          pred_text = "".join(decoded_texts[sample_id])
+
       if self.get_data_layer().params.get('autoregressive', False):
         true_text = true_text[:-4]
 
@@ -307,8 +326,12 @@ class Speech2Text(EncoderDecoderModel):
           self.get_data_layer().params['idx2char'],
           **self.tensor_to_char_params
       )
-      for decoded_text in decoded_texts:
-        preds.append("".join(decoded_text))
+      if self.is_chn:
+        for decoded_text in decoded_texts:
+          preds.append(" ".join(decoded_text))
+      else:
+        for decoded_text in decoded_texts:
+          preds.append("".join(decoded_text))
 
     return preds, input_values['source_ids']
 

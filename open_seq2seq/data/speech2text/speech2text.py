@@ -30,7 +30,7 @@ class Speech2TextDataLayer(DataLayer):
     return dict(DataLayer.get_required_params(), **{
         'num_audio_features': int,
         'input_type': ['spectrogram', 'mfcc', 'logfbank'],
-        'data_format': ['wav', 'feat'],
+        'feat_format': ['wav', 'feat'],
         'vocab_file': str,
         'dataset_files': list,
     })
@@ -230,7 +230,7 @@ class Speech2TextDataLayer(DataLayer):
           self._dataset = self._dataset.shuffle(self._size)
         self._dataset = self._dataset.repeat()
         self._dataset = self._dataset.prefetch(tf.contrib.data.AUTOTUNE)
-        if self.params['data_format'] == 'wav':
+        if self.params['feat_format'] == 'wav':
           self._dataset = self._dataset.map(
               lambda line: tf.py_func(
                   self._parse_audio_transcript_element,
@@ -282,7 +282,7 @@ class Speech2TextDataLayer(DataLayer):
         )
         self._dataset = self._dataset.repeat()
         self._dataset = self._dataset.prefetch(tf.contrib.data.AUTOTUNE)
-        if self.params['data_format'] == 'wav':
+        if self.params['feat_format'] == 'wav':
           self._dataset = self._dataset.map(
               lambda line: tf.py_func(
                   self._parse_audio_element,
