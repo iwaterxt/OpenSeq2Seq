@@ -21,7 +21,7 @@ import pickle
 def sparse_tensor_to_chars(tensor, idx2char):
   text = [''] * tensor.dense_shape[0]
   for idx_tuple, value in zip(tensor.indices, tensor.values):
-    text[idx_tuple[0]] += idx2char[value]
+    text[idx_tuple[0]] += idx2char[value]+" "
   return text
 
 
@@ -215,11 +215,11 @@ class Speech2Text(EncoderDecoderModel):
             self.get_data_layer().params['idx2char'].get,
             y_one_sample[:len_y_one_sample],
         ))
-        pred_text = " ".join(self.tensor_to_chars(
+        pred_text = self.tensor_to_chars(
             decoded_sequence_one_batch,
             self.get_data_layer().params['idx2char'],
             **self.tensor_to_char_params
-        )[0])
+        )[0]
       else:
         true_text = "".join(map(
             self.get_data_layer().params['idx2char'].get,
@@ -295,7 +295,7 @@ class Speech2Text(EncoderDecoderModel):
         if self.is_chn:
           true_text = " ".join(map(self.get_data_layer().params['idx2char'].get,
                                 y[:len_y]))
-          pred_text = " ".join(decoded_texts[sample_id])
+          pred_text = decoded_texts[sample_id]
         else:
           true_text = "".join(map(self.get_data_layer().params['idx2char'].get,
                                 y[:len_y]))
