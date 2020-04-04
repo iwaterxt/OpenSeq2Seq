@@ -44,11 +44,11 @@ def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames)
   )
   return top_layer
 
-
+'''
 def layer_norm(name, input_layer):
   """ run layer normalization on the feature dimmension of the tensor."""
   return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=, begin_params_axis=)
-
+'''
 
 def rnn_cell(rnn_cell_dim, layer_type, dropout_keep_prob=1.0):
   """Helper function that creates RNN cell."""
