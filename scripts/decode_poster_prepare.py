@@ -23,9 +23,8 @@ def load_map(feats_scp):
 			l = line.strip().split()
 			encoding = 'utf-8'
 			feat2utt[str(l[1], encoding)] = str(l[0], encoding)
-	print (feat2utt)
 	return feat2utt
-	
+
 def softmax(x):
   m = np.expand_dims(np.max(x, axis=-1), -1)
   e = np.exp(x - m)
