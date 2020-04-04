@@ -20,8 +20,8 @@ def load_map(feats_scp):
 	with open(feats_scp, 'rb') as f:
 		lines = f.readlines()
 		for line in lines:
-			l = line.split()
-			feat2utt[l[1]] = str(l[0])
+			l = line.strip().split()
+			feat2utt[str(l[1])] = str(l[0])
 	return feat2utt
 
 def softmax(x):
