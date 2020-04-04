@@ -39,7 +39,7 @@ def main(pickle_file, ark_file, feats_scp):
 			end_col = np.zeros((r,1))
 			end_col[:,0] = np.copy(mat[:, l-1])
 			mat_new = np.hstack((end_col, mat[:, 0:l-2]))
-			kaldi_io.write_mat(feat2utt[f], np.log(softmax(mat_new)), key=key)
+			kaldi_io.write_mat(f, np.log(softmax(mat_new)), key=feat2utt[key])
 
 
 if __name__ == "__main__":
