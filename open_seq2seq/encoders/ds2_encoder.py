@@ -10,6 +10,46 @@ from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
 
+def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames):
+
+  input_shape = input_layer.get_shape().as_list()
+  B, T = input_shape[0], input_shape[1]
+  context_len = len(context)
+  array = tf.TensorArray(x.dtype, size=context_len)
+  for idx, offset in enumerate(context):
+    begin = offset
+    end = T + offset
+    if begin < 0:
+      begin = 0
+      sliced = x[:, begin:end, :]
+      tiled = tf.tile(x[:, 0:1, :], [1, abs(offset), 1])
+      final = tf.concat((tiled, sliced), axis=1)
+    else:
+      end = T
+      sliced = x[:, begin:end, :]
+      tiled = tf.tile(x[:, -1:, :], [1, abs(offset), 1])
+      final = tf.concat((sliced, tiled), axis=1)
+    array = array.write(idx, final)
+  spliced = array.stack()
+  spliced = tf.transpose(spliced, (1, 2, 0, 3))
+  spliced = tf.reshape(spliced, (B, T, -1))
+
+  top_layer = tf.layers.dense(
+      name=name+"/affine",
+      inputs=spliced,
+      units=input_dim,
+      kernel_regularizer=regularizer,
+      activation=None,
+      name='fully_connected',
+  )
+  return top_layer
+
+
+def layer_norm(name, input_layer):
+  """ run layer normalization on the feature dimmension of the tensor."""
+  return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=, begin_params_axis=)
+
+
 def rnn_cell(rnn_cell_dim, layer_type, dropout_keep_prob=1.0):
   """Helper function that creates RNN cell."""
   if layer_type == "layernorm_lstm":
@@ -189,8 +229,8 @@ class DeepSpeech2Encoder(Encoder):
     input_layer = tf.expand_dims(source_sequence, axis=-1) # BTFC
     # print("<<< input   :", input_layer.get_shape().as_list())
 
-    batch_size = input_layer.get_shape().as_list()[0]
-    freq = input_layer.get_shape().as_list()[2]
+    batch_size = input_layer.get_shape().as_list()[0] #number of streams
+    freq = input_layer.get_shape().as_list()[2] #feature dim
 
     # supported data_formats:
     #    BTFC = channel_last (legacy)
