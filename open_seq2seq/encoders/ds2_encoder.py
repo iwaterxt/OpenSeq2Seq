@@ -9,7 +9,7 @@ from six.moves import range
 from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
-
+'''
 def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames):
 
   input_shape = input_layer.get_shape().as_list()
@@ -43,7 +43,7 @@ def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames)
       name='fully_connected',
   )
   return top_layer
-
+'''
 '''
 def layer_norm(name, input_layer):
   """ run layer normalization on the feature dimmension of the tensor."""
