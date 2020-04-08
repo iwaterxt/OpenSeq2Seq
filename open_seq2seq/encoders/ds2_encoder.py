@@ -9,9 +9,26 @@ from six.moves import range
 from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
-'''
-def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames):
 
+def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames):
+  '''
+  Splice a tensor along the last dimension with context.
+  e.g.:
+  t = [[[1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]]]
+  splice_tensor(t, [0, 1]) =
+      [[[1, 2, 3, 4, 5, 6],
+        [4, 5, 6, 7, 8, 9],
+        [7, 8, 9, 7, 8, 9]]]
+
+  Args:
+    tensor: a tf.Tensor with shape (B, T, D) a.k.a. (N, H, W)
+    context: a list of context offsets
+
+  Returns:
+    spliced tensor with shape (..., D * len(context))
+  '''
   input_shape = input_layer.get_shape().as_list()
   B, T = input_shape[0], input_shape[1]
   context_len = len(context)
@@ -43,12 +60,12 @@ def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames)
       name='fully_connected',
   )
   return top_layer
-'''
-'''
+
+
 def layer_norm(name, input_layer):
   """ run layer normalization on the feature dimmension of the tensor."""
-  return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=, begin_params_axis=)
-'''
+  return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=-1, begin_params_axis=-1, scope=name)
+
 
 def rnn_cell(rnn_cell_dim, layer_type, dropout_keep_prob=1.0):
   """Helper function that creates RNN cell."""
