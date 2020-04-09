@@ -10,7 +10,7 @@ from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
 
-def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames=1):
+def splice_skip(name, input_layer, regularizer, context, skip_frames=1):
   '''
   Splice a tensor along the last dimension with context.
   e.g.:
@@ -30,7 +30,7 @@ def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames=
     spliced tensor with shape (..., D * len(context))
   '''
   input_shape = input_layer.get_shape().as_list()
-  B, T = input_shape[0], input_shape[1]
+  B, T, D = input_shape[0], input_shape[1], input_shape[2]
   context_len = len(context)
   array = tf.TensorArray(input_layer.dtype, size=context_len)
   for idx, offset in enumerate(context):
@@ -57,7 +57,7 @@ def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames=
 
   top_layer = tf.layers.dense(
       inputs=spliced,
-      units=input_dim,
+      units=D,
       kernel_regularizer=regularizer,
       activation=None,
       name='fully_connected',
@@ -414,6 +414,14 @@ class DeepSpeech2Encoder(Encoder):
               dtype=rnn_input.dtype,
               time_major=False
           )
+
+          top_layer = splice_skip(
+                          name = "splice_skip", 
+                          input_layer = top_layer,  
+                          regularizer = regularizer, 
+                          context=[0 1], 
+                          skip_frames = 2)
+
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
           top_layer = tf.concat(top_layer, 2)
     # -- end of rnn------------------------------------------------------------
