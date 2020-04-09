@@ -10,7 +10,7 @@ from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
 
-def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames):
+def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames=1):
   '''
   Splice a tensor along the last dimension with context.
   e.g.:
@@ -32,24 +32,28 @@ def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames)
   input_shape = input_layer.get_shape().as_list()
   B, T = input_shape[0], input_shape[1]
   context_len = len(context)
-  array = tf.TensorArray(x.dtype, size=context_len)
+  array = tf.TensorArray(input_layer.dtype, size=context_len)
   for idx, offset in enumerate(context):
     begin = offset
     end = T + offset
     if begin < 0:
       begin = 0
-      sliced = x[:, begin:end, :]
-      tiled = tf.tile(x[:, 0:1, :], [1, abs(offset), 1])
+      sliced = input_layer[:, begin:end, :]
+      tiled = tf.tile(input_layer[:, 0:1, :], [1, abs(offset), 1])
       final = tf.concat((tiled, sliced), axis=1)
     else:
       end = T
-      sliced = x[:, begin:end, :]
-      tiled = tf.tile(x[:, -1:, :], [1, abs(offset), 1])
+      sliced = input_layer[:, begin:end, :]
+      tiled = tf.tile(input_layer[:, -1:, :], [1, abs(offset), 1])
       final = tf.concat((sliced, tiled), axis=1)
     array = array.write(idx, final)
   spliced = array.stack()
   spliced = tf.transpose(spliced, (1, 2, 0, 3))
   spliced = tf.reshape(spliced, (B, T, -1))
+
+  if skip_frames > 1:
+    indexs = tf.range(0, T, skip_frames)
+    spliced = tf.gather(spliced, indexs, axis=1)
 
   top_layer = tf.layers.dense(
       name=name+"/affine",
