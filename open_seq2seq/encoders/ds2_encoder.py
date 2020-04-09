@@ -60,7 +60,7 @@ def splice_skip(name, input_layer, regularizer, context, skip_frames=1):
       units=D,
       kernel_regularizer=regularizer,
       activation=None,
-      name='fully_connected',
+      name=name+'/fully_connected',
   )
   return top_layer
 
