@@ -414,12 +414,12 @@ class DeepSpeech2Encoder(Encoder):
               dtype=rnn_input.dtype,
               time_major=False
           )
-
+          context = [0, 1]
           top_layer = splice_skip(
                           name = "splice_skip", 
                           input_layer = top_layer,  
                           regularizer = regularizer, 
-                          context=[0 1], 
+                          context=context, 
                           skip_frames = 2)
 
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
