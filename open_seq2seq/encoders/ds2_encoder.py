@@ -30,7 +30,9 @@ def splice_skip(name, input_layer, regularizer, context, skip_frames=1):
     spliced tensor with shape (..., D * len(context))
   '''
   input_shape = input_layer.get_shape().as_list()
-  B, T, D = input_shape[0], input_shape[1], input_shape[2]
+
+  B, D = input_shape[0], input_shape[2]
+  T = tf.shape(input_layer)[1]
   context_len = len(context)
   array = tf.TensorArray(input_layer.dtype, size=context_len)
   for idx, offset in enumerate(context):
