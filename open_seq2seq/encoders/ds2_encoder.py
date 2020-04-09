@@ -56,7 +56,6 @@ def splice_skip(name, input_layer, input_dim, regularizer, context, skip_frames=
     spliced = tf.gather(spliced, indexs, axis=1)
 
   top_layer = tf.layers.dense(
-      name=name+"/affine",
       inputs=spliced,
       units=input_dim,
       kernel_regularizer=regularizer,
