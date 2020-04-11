@@ -68,6 +68,7 @@ def sub_sample(name, input_layer, regularizer, skip_frames=1):
         activation=None,
         name=name+'/fully_connected',
     )
+    return input_layer
   else:
     return input_layer
 
@@ -398,7 +399,7 @@ class DeepSpeech2Encoder(Encoder):
               name="sub_sample",
               input_layer = top_layer,
               regularizer = regularizer,
-              skip_frames = 1
+              skip_frames = 2,
         )
 
       else:
@@ -433,7 +434,7 @@ class DeepSpeech2Encoder(Encoder):
               name="sub_sample",
               input_layer = top_layer,
               regularizer = regularizer,
-              skip_frames = 2
+              skip_frames = 2,
           )
 
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
