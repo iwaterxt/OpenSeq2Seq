@@ -389,13 +389,13 @@ class DeepSpeech2Encoder(Encoder):
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
 
-        #context = [0, 1]
-        #top_layer = splice_skip(
-        #                name = "splice_skip", 
-        #                input_layer = top_layer,  
-        #                regularizer = regularizer, 
-        #                context=context, 
-        #                skip_frames = 1)
+        context = [0, 1]
+        top_layer = splice_skip(
+                        name = "splice_skip", 
+                        input_layer = top_layer,  
+                        regularizer = regularizer, 
+                        context=context, 
+                        skip_frames = 2)
 
       else:
         rnn_input = top_layer
