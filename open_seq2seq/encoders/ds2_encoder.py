@@ -51,8 +51,8 @@ def splice_skip(name, input_layer, regularizer, context, skip_frames=1):
     array = array.write(idx, final)
   spliced = array.stack()
   spliced = tf.transpose(spliced, (1, 2, 0, 3))
-  spliced = tf.reshape(spliced, (B, T, -1))
-
+  spliced = tf.reshape(spliced, (B, T, D*context_len))
+  print (spliced.get_shape().as_list())
   if skip_frames > 1:
     indexs = tf.range(0, T, skip_frames)
     spliced = tf.gather(spliced, indexs, axis=1)
@@ -388,13 +388,15 @@ class DeepSpeech2Encoder(Encoder):
           )
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
+'''
         context = [0, 1]
         top_layer = splice_skip(
                         name = "splice_skip", 
                         input_layer = top_layer,  
                         regularizer = regularizer, 
                         context=context, 
-                        skip_frames = 2)
+                        skip_frames = 1)
+'''
       else:
         rnn_input = top_layer
         multirnn_cell_fw = tf.nn.rnn_cell.MultiRNNCell(
