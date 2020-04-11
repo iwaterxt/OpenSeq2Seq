@@ -398,7 +398,7 @@ class DeepSpeech2Encoder(Encoder):
               name="sub_sample",
               input_layer = top_layer,
               regularizer = regularizer,
-              skip_frames = 2
+              skip_frames = 1
         )
 
       else:
