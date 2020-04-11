@@ -10,7 +10,7 @@ from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
 
-def splice_skip(name, input_layer, regularizer, context, skip_frames=1):
+def splice(name, input_layer, regularizer, context, skip_frames=1):
   '''
   Splice a tensor along the last dimension with context.
   e.g.:
@@ -29,10 +29,8 @@ def splice_skip(name, input_layer, regularizer, context, skip_frames=1):
   Returns:
     spliced tensor with shape (..., D * len(context))
   '''
-  input_shape = input_layer.get_shape().as_list()
-
-  B, D = input_shape[0], input_shape[2]
-  T = tf.shape(input_layer)[1]
+  input_shape = tf.shape(input_layer)
+  B, T, D = input_shape[0], input_shape[1], input_shape[2]
   context_len = len(context)
   array = tf.TensorArray(input_layer.dtype, size=context_len)
   for idx, offset in enumerate(context):
@@ -52,9 +50,13 @@ def splice_skip(name, input_layer, regularizer, context, skip_frames=1):
   spliced = array.stack()
   spliced = tf.transpose(spliced, (1, 2, 0, 3))
   spliced = tf.reshape(spliced, (B, T, D*context_len))
-  print (spliced.get_shape().as_list())
+
   if skip_frames > 1:
-    indexs = tf.range(0, T, skip_frames)
+    #indexs = tf.range(0, T, skip_frames)
+    indexs = []
+    for i in range(T, 2):
+      indexs.append(i)
+    indexs = tf.reshape(indexs, [1,-1])
     spliced = tf.gather(spliced, indexs, axis=1)
 
   top_layer = tf.layers.dense(
@@ -390,7 +392,7 @@ class DeepSpeech2Encoder(Encoder):
         top_layer = tf.transpose(top_layer, [1, 0, 2])
 
         context = [0, 1]
-        top_layer = splice_skip(
+        top_layer = splice(
                         name = "splice_skip", 
                         input_layer = top_layer,  
                         regularizer = regularizer, 
@@ -426,7 +428,7 @@ class DeepSpeech2Encoder(Encoder):
               time_major=False
           )
           context = [0, 1]
-          top_layer = splice_skip(
+          top_layer = splice(
                           name = "splice_skip", 
                           input_layer = top_layer,  
                           regularizer = regularizer, 
