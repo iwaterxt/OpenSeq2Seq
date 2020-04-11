@@ -10,7 +10,7 @@ from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
 
-def splice(name, input_layer, regularizer, context, skip_frames=1):
+def splice(name, input_layer, context):
   '''
   Splice a tensor along the last dimension with context.
   e.g.:
@@ -49,19 +49,27 @@ def splice(name, input_layer, regularizer, context, skip_frames=1):
     array = array.write(idx, final)
   spliced = array.stack()
   spliced = tf.transpose(spliced, (1, 2, 0, 3))
-  spliced = tf.reshape(spliced, (B, T, D*context_len))
+  spliced = tf.reshape(spliced, (B, T, -1))
+
+  return spliced
+
+def sub_sample(name, input_layer, skip_frames=1)
 
   if skip_frames > 1:
-    spliced = tf.gather(spliced, indexs, axis=1)
+    input_shape = tf.shape(input_layer)
+    B, T, D = input_shape[0], input_shape[1], input_shape[2]
 
-  top_layer = tf.layers.dense(
-      inputs=spliced,
-      units=D,
-      kernel_regularizer=regularizer,
-      activation=None,
-      name=name+'/fully_connected',
-  )
-  return top_layer
+    input_layer = tf.reshape(input_layer, [B, -1, D*skip_frames])
+
+    input_layer = tf.layers.dense(
+        inputs=input_layer,
+        units=D,
+        kernel_regularizer=regularizer,
+        activation=None,
+        name=name+'/fully_connected',
+    )
+  else:
+    return input_layer
 
 
 def layer_norm(name, input_layer):
@@ -386,13 +394,12 @@ class DeepSpeech2Encoder(Encoder):
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
 
-        context = [0, 1]
-        top_layer = splice(
-                        name = "splice_skip", 
-                        input_layer = top_layer,  
-                        regularizer = regularizer, 
-                        context=context, 
-                        skip_frames = 2)
+        top_layer = sub_sample(
+              name="sub_sample",
+              input_layer = top_layer,
+              regularizer = regularizer,
+              skip_frames = 2
+        )
 
       else:
         rnn_input = top_layer
@@ -422,13 +429,12 @@ class DeepSpeech2Encoder(Encoder):
               dtype=rnn_input.dtype,
               time_major=False
           )
-          context = [0, 1]
-          top_layer = splice(
-                          name = "splice_skip", 
-                          input_layer = top_layer,  
-                          regularizer = regularizer, 
-                          context=context, 
-                          skip_frames = 2)
+          top_layer = sub_sample(
+              name="sub_sample",
+              input_layer = top_layer,
+              regularizer = regularizer,
+              skip_frames = 2
+          )
 
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
           top_layer = tf.concat(top_layer, 2)
