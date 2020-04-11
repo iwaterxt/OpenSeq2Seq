@@ -56,8 +56,8 @@ def splice(name, input_layer, context):
 def sub_sample(name, input_layer, regularizer, skip_frames=1):
 
   if skip_frames > 1:
-    input_shape = tf.shape(input_layer)
-    B, T, D = input_shape[0], input_shape[1], input_shape[2]
+    input_shape = input_layer.get_shape().as_list()
+    B, D = input_shape[0], input_shape[2]
 
     input_layer = tf.reshape(input_layer, [B, -1, D*skip_frames])
 
