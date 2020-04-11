@@ -38,7 +38,7 @@ def main(pickle_file, ark_file, feats_scp):
 		for key,mat in poster_dict.items():
 			r,l = mat.shape
 			end_col = np.zeros((r,1))
-			end_col = np.copy(mat[:, l-1])
+			end_col[:,0] = np.copy(mat[:, l-1])
 			mat_new = np.hstack((end_col, mat[:, 0:l-2]))
 			kaldi_io.write_mat(f, np.log(softmax(mat_new)), key=feat2utt[key])
 
