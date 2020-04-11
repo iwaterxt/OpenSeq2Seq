@@ -53,7 +53,7 @@ def splice(name, input_layer, context):
 
   return spliced
 
-def sub_sample(name, input_layer, skip_frames=1)
+def sub_sample(name, input_layer, skip_frames=1):
 
   if skip_frames > 1:
     input_shape = tf.shape(input_layer)
