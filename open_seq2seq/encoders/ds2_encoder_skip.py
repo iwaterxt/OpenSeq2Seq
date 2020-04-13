@@ -65,6 +65,7 @@ def sub_sample(name, input_layer, regularizer, skip_frames=1):
     else:
       sliced = input_layer[:, (T%skip_frames - skip_frames):, :]
       input_layer = tf.concat((input_layer, sliced), axis=1)
+      input_layer = tf.reshape(input_layer, [B, -1, D*skip_frames])
 
     input_layer = tf.layers.dense(
         inputs=input_layer,
