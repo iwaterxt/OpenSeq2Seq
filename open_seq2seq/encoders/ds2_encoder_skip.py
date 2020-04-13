@@ -60,16 +60,19 @@ def sub_sample(name, input_layer, regularizer, skip_frames=1):
     T = tf.shape(input_layer)[1]
     input_shape = input_layer.get_shape().as_list()
     B, D = input_shape[0], input_shape[2]
+    if T % skip_frames == 0:
+      input_layer = tf.reshape(input_layer, [B, -1, D*skip_frames])
+    else:
+      sliced = input_layer[:, (T%skip_frames - skip_frames):, :]
+      input_layer = tf.concat((input_layer, sliced), axis=1)
 
-    input_layer = tf.reshape(input_layer, [B, T//skip_frames, D*skip_frames])
-
-    #input_layer = tf.layers.dense(
-    #    inputs=input_layer,
-    #    units=D,
-    #    kernel_regularizer=regularizer,
-    #    activation=None,
-    #    name=name+'/fully_connected',
-    #)
+    input_layer = tf.layers.dense(
+        inputs=input_layer,
+        units=D,
+        kernel_regularizer=regularizer,
+        activation=None,
+        name=name+'/fully_connected',
+    )
     return input_layer
   else:
     return input_layer
@@ -175,9 +178,11 @@ class DeepSpeech2EncoderInnerSkip(Encoder):
   def get_optional_params():
     return dict(Encoder.get_optional_params(), **{
         'row_conv_width': int,
+        'skip_frames':  int,
         'data_format': ['channels_first', 'channels_last', 'BCTF', 'BTFC', 'BCFT', 'BFTC'],
         'bn_momentum': float,
         'bn_epsilon': float,
+
     })
 
   def __init__(self, params, model, name="ds2_encoder", mode='train'):
@@ -215,6 +220,7 @@ class DeepSpeech2EncoderInnerSkip(Encoder):
       layer after RNNs.
     * **row_conv_width** (int) --- width parameter for "row"
       convolutional layer.
+    * **skip_frames (int) --- number of frames inner skip
     * **n_hidden** (int) --- number of hidden units for the last fully connected
       layer.
     * **data_format** (string) --- could be either
@@ -252,9 +258,11 @@ class DeepSpeech2EncoderInnerSkip(Encoder):
     training = (self._mode == "train")
     dropout_keep_prob = self.params['dropout_keep_prob'] if training else 1.0
     regularizer = self.params.get('regularizer', None)
+    skip_frames = self.params.get('skip_frames', 1)
     data_format = self.params.get('data_format', 'channels_last')
     bn_momentum = self.params.get('bn_momentum', 0.99)
     bn_epsilon = self.params.get('bn_epsilon', 1e-3)
+
 
     input_layer = tf.expand_dims(source_sequence, axis=-1) # BTFC
     # print("<<< input   :", input_layer.get_shape().as_list())
@@ -396,19 +404,14 @@ class DeepSpeech2EncoderInnerSkip(Encoder):
           )
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
-
+        # subsample
         top_layer = sub_sample(
-              name="sub_sample",
               input_layer = top_layer,
               regularizer = regularizer,
-              skip_frames = 2,
+              skip_frames = skip_frames,
+              name="sub_sample",
         )
-        src_length = src_length // 2
-        #context = [0,1]
-        #top_layer = splice(
-        #      name = "splice", 
-        #      input_layer = top_layer, 
-        #      context = context)
+        src_length = (src_length + skip_frames - 1) // skip_frames
 
       else:
         rnn_input = top_layer
@@ -438,15 +441,16 @@ class DeepSpeech2EncoderInnerSkip(Encoder):
               dtype=rnn_input.dtype,
               time_major=False
           )
-          top_layer = sub_sample(
-              name="sub_sample",
-              input_layer = top_layer,
-              regularizer = regularizer,
-              skip_frames = 2,
-          )
-
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
           top_layer = tf.concat(top_layer, 2)
+        # subsample
+        top_layer = sub_sample(
+            input_layer = top_layer,
+            regularizer = regularizer,
+            skip_frames = skip_frames,
+            name="sub_sample",
+        )
+        src_length = (src_length + skip_frames - 1) // skip_frames
     # -- end of rnn------------------------------------------------------------
 
     if self.params['row_conv']:

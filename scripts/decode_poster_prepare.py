@@ -39,7 +39,7 @@ def main(pickle_file, ark_file, feats_scp):
 			r,l = mat.shape
 			mat_new = np.zeros((r,l))
 			mat_new[:,0] = mat[:, l-1]
-			mat_new[:,1:l-1] = mat[:, 0:l-2]
+			mat_new[:,1:l] = mat[:, 0:l-1]
 			kaldi_io.write_mat(f, np.log(softmax(mat_new)), key=feat2utt[key])
 
 
