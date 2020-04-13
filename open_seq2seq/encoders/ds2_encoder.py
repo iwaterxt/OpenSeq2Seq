@@ -84,7 +84,7 @@ def layer_norm(name, input_layer):
   return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=-1, begin_params_axis=-1, scope=name)
 
 
-def rnn_cell(rnn_cell_dim, layer_type, dropout_keep_prob=1.0):
+def rnn_cell(rnn_cell_dim, layer_type, dropout_keep_prob=1.0, proj_dim=None):
   """Helper function that creates RNN cell."""
   if layer_type == "layernorm_lstm":
     # pylint: disable=no-member
@@ -93,6 +93,8 @@ def rnn_cell(rnn_cell_dim, layer_type, dropout_keep_prob=1.0):
   else:
     if layer_type == "lstm":
       cell = tf.nn.rnn_cell.BasicLSTMCell(rnn_cell_dim)
+    elif layer_type == "plstm":
+      cell = tf.nn.rnn_cell.LSTMCell(num_units=rnn_cell_dim, use_peepholes=True, cell_clip=50, num_proj=proj_dim, forget_bias=1.5)
     elif layer_type == "gru":
       cell = tf.nn.rnn_cell.GRUCell(rnn_cell_dim)
     elif layer_type == "cudnn_gru":
@@ -170,8 +172,9 @@ class DeepSpeech2Encoder(Encoder):
         'n_hidden': int,
         'use_cudnn_rnn': bool,
         'rnn_cell_dim': int,
+        'proj_dim': None,
         'rnn_type': ['layernorm_lstm', 'lstm', 'gru',
-                     'cudnn_gru', 'cudnn_lstm'],
+                     'cudnn_gru', 'cudnn_lstm', 'plstm'],
         'rnn_unidirectional': bool,
     })
 
@@ -369,6 +372,7 @@ class DeepSpeech2Encoder(Encoder):
     num_rnn_layers = self.params['num_rnn_layers']
     if num_rnn_layers > 0:
       rnn_cell_dim = self.params['rnn_cell_dim']
+      proj_dim = self.params['proj_dim']
       rnn_type = self.params['rnn_type']
       if self.params['use_cudnn_rnn']:
         # reshape to [B, T, C] --> [T, B, C]
@@ -418,7 +422,7 @@ class DeepSpeech2Encoder(Encoder):
         rnn_input = top_layer
         multirnn_cell_fw = tf.nn.rnn_cell.MultiRNNCell(
             [rnn_cell(rnn_cell_dim=rnn_cell_dim, layer_type=rnn_type,
-                      dropout_keep_prob=dropout_keep_prob)
+                      dropout_keep_prob=dropout_keep_prob, proj_dim=proj_dim)
              for _ in range(num_rnn_layers)]
         )
         if self.params['rnn_unidirectional']:
