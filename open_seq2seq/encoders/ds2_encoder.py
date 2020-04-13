@@ -397,13 +397,6 @@ class DeepSpeech2Encoder(Encoder):
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
 
-        top_layer = sub_sample(
-              name="sub_sample",
-              input_layer = top_layer,
-              regularizer = regularizer,
-              skip_frames = 2,
-        )
-
       else:
         rnn_input = top_layer
         multirnn_cell_fw = tf.nn.rnn_cell.MultiRNNCell(

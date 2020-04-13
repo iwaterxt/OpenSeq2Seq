@@ -153,7 +153,7 @@ def row_conv(name, input_layer, batch, channels, width, activation_fn,
   return output
 
 
-class DeepSpeech2Encoder(Encoder):
+class DeepSpeech2EncoderInnerSkip(Encoder):
   """DeepSpeech-2 like encoder."""
   @staticmethod
   def get_required_params():
