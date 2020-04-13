@@ -63,13 +63,13 @@ def sub_sample(name, input_layer, regularizer, skip_frames=1):
 
     input_layer = tf.reshape(input_layer, [B, T//skip_frames, D*skip_frames])
 
-    input_layer = tf.layers.dense(
-        inputs=input_layer,
-        units=D,
-        kernel_regularizer=regularizer,
-        activation=None,
-        name=name+'/fully_connected',
-    )
+    #input_layer = tf.layers.dense(
+    #    inputs=input_layer,
+    #    units=D,
+    #    kernel_regularizer=regularizer,
+    #    activation=None,
+    #    name=name+'/fully_connected',
+    #)
     return input_layer
   else:
     return input_layer
@@ -403,6 +403,12 @@ class DeepSpeech2Encoder(Encoder):
               regularizer = regularizer,
               skip_frames = 2,
         )
+        src_length = src_length // 2
+        #context = [0,1]
+        #top_layer = splice(
+        #      name = "splice", 
+        #      input_layer = top_layer, 
+        #      context = context)
 
       else:
         rnn_input = top_layer
@@ -431,6 +437,12 @@ class DeepSpeech2Encoder(Encoder):
               sequence_length=src_length,
               dtype=rnn_input.dtype,
               time_major=False
+          )
+          top_layer = sub_sample(
+              name="sub_sample",
+              input_layer = top_layer,
+              regularizer = regularizer,
+              skip_frames = 2,
           )
 
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
