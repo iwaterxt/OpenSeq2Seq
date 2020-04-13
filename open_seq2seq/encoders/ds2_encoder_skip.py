@@ -229,7 +229,7 @@ class DeepSpeech2EncoderInnerSkip(Encoder):
     * **bn_momentum** (float) --- momentum for batch norm. Defaults to 0.99.
     * **bn_epsilon** (float) --- epsilon for batch norm. Defaults to 1e-3.
     """
-    super(DeepSpeech2Encoder, self).__init__(params, model, name, mode)
+    super(DeepSpeech2EncoderInnerSkip, self).__init__(params, model, name, mode)
 
   def _encode(self, input_dict):
     """Creates TensorFlow graph for DeepSpeech-2 like encoder.
