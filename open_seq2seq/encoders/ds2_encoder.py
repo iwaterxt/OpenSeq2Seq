@@ -79,7 +79,7 @@ def subsample(name, input_layer, regularizer, skip_frames=1):
     return input_layer
 
 
-def layer_norm(name, input_layer):
+def layer_normalize(name, input_layer):
   """ run layer normalization on the feature dimmension of the tensor."""
   return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=-1, begin_params_axis=-1, scope=name+'/layer_norm')
 
@@ -271,7 +271,7 @@ class DeepSpeech2Encoder(Encoder):
     bn_epsilon = self.params.get('bn_epsilon', 1e-3)
 
     if layer_norm:
-      source_sequence = layer_norm(
+      source_sequence = layer_normalize(
                           input_layer = source_sequence,
                           name = "layer_norm")
 
