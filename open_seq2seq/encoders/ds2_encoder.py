@@ -172,7 +172,6 @@ class DeepSpeech2Encoder(Encoder):
         'n_hidden': int,
         'use_cudnn_rnn': bool,
         'rnn_cell_dim': int,
-        'proj_dim': None,
         'rnn_type': ['layernorm_lstm', 'lstm', 'gru',
                      'cudnn_gru', 'cudnn_lstm', 'plstm'],
         'rnn_unidirectional': bool,
@@ -184,6 +183,7 @@ class DeepSpeech2Encoder(Encoder):
         'row_conv_width': int,
         'skip_frames':  int,
         'layer_norm': bool,
+        'proj_dim': int,
         'data_format': ['channels_first', 'channels_last', 'BCTF', 'BTFC', 'BCFT', 'BFTC'],
         'bn_momentum': float,
         'bn_epsilon': float,
@@ -265,6 +265,7 @@ class DeepSpeech2Encoder(Encoder):
     regularizer = self.params.get('regularizer', None)
     skip_frames = self.params.get('skip_frames', 1)
     layer_norm = self.params.get('layer_norm', False)
+    proj_dim = self.params.get('proj_dim', None)
     data_format = self.params.get('data_format', 'channels_last')
     bn_momentum = self.params.get('bn_momentum', 0.99)
     bn_epsilon = self.params.get('bn_epsilon', 1e-3)
@@ -378,7 +379,6 @@ class DeepSpeech2Encoder(Encoder):
     num_rnn_layers = self.params['num_rnn_layers']
     if num_rnn_layers > 0:
       rnn_cell_dim = self.params['rnn_cell_dim']
-      proj_dim = self.params['proj_dim']
       rnn_type = self.params['rnn_type']
       if self.params['use_cudnn_rnn']:
         # reshape to [B, T, C] --> [T, B, C]
