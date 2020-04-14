@@ -54,7 +54,7 @@ def splice(name, input_layer, context):
 
   return spliced
 
-def sub_sample(name, input_layer, regularizer, skip_frames=1):
+def subsample(name, input_layer, regularizer, skip_frames=1):
 
   if skip_frames > 1:
     T = tf.shape(input_layer)[1]
@@ -81,7 +81,7 @@ def sub_sample(name, input_layer, regularizer, skip_frames=1):
 
 def layer_norm(name, input_layer):
   """ run layer normalization on the feature dimmension of the tensor."""
-  return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=-1, begin_params_axis=-1, scope=name)
+  return tf.contrib.layers.layer_norm(inputs=input_layer, begin_norm_axis=-1, begin_params_axis=-1, scope=name+'/layer_norm')
 
 
 def rnn_cell(rnn_cell_dim, layer_type, dropout_keep_prob=1.0, proj_dim=None):
@@ -183,6 +183,7 @@ class DeepSpeech2Encoder(Encoder):
     return dict(Encoder.get_optional_params(), **{
         'row_conv_width': int,
         'skip_frames':  int,
+        'layer_norm': bool,
         'data_format': ['channels_first', 'channels_last', 'BCTF', 'BTFC', 'BCFT', 'BFTC'],
         'bn_momentum': float,
         'bn_epsilon': float,
@@ -263,10 +264,15 @@ class DeepSpeech2Encoder(Encoder):
     dropout_keep_prob = self.params['dropout_keep_prob'] if training else 1.0
     regularizer = self.params.get('regularizer', None)
     skip_frames = self.params.get('skip_frames', 1)
+    layer_norm = self.params.get('layer_norm', False)
     data_format = self.params.get('data_format', 'channels_last')
     bn_momentum = self.params.get('bn_momentum', 0.99)
     bn_epsilon = self.params.get('bn_epsilon', 1e-3)
 
+    if layer_norm:
+      source_sequence = layer_norm(
+                          input_layer = source_sequence,
+                          name = "layer_norm")
 
     input_layer = tf.expand_dims(source_sequence, axis=-1) # BTFC
     # print("<<< input   :", input_layer.get_shape().as_list())
@@ -410,11 +416,11 @@ class DeepSpeech2Encoder(Encoder):
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
         # subsample
-        top_layer = sub_sample(
+        top_layer = subsample(
               input_layer = top_layer,
               regularizer = regularizer,
               skip_frames = skip_frames,
-              name="sub_sample",
+              name="subsample",
         )
         src_length = (src_length + skip_frames - 1) // skip_frames
 
@@ -449,11 +455,11 @@ class DeepSpeech2Encoder(Encoder):
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
           top_layer = tf.concat(top_layer, 2)
         # subsample
-        top_layer = sub_sample(
+        top_layer = subsample(
             input_layer = top_layer,
             regularizer = regularizer,
             skip_frames = skip_frames,
-            name="sub_sample",
+            name="subsample",
         )
         src_length = (src_length + skip_frames - 1) // skip_frames
     # -- end of rnn------------------------------------------------------------
