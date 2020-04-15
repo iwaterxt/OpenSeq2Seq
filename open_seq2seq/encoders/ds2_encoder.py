@@ -185,14 +185,9 @@ class DeepSpeech2Encoder(Encoder):
         'feat_layers': dict,
         'conv_layers': list,
         'activation_fn': None,  # any valid callable
-        'num_rnn_layers': int,
+        'rnn_layers': dict,
         'row_conv': bool,
         'n_hidden': int,
-        'use_cudnn_rnn': bool,
-        'rnn_cell_dim': int,
-        'rnn_type': ['layernorm_lstm', 'lstm', 'gru',
-                     'cudnn_gru', 'cudnn_lstm', 'plstm'],
-        'rnn_unidirectional': bool,
     })
 
   @staticmethod
@@ -467,7 +462,7 @@ class DeepSpeech2Encoder(Encoder):
                       dropout_keep_prob=dropout_keep_prob, proj_dim=proj_dim)
              for _ in range(num_rnn_layers)]
         )
-        
+
         if rnn_layers['rnn_unidirectional']:
           top_layer, state = tf.nn.dynamic_rnn(
               cell=multirnn_cell_fw,
