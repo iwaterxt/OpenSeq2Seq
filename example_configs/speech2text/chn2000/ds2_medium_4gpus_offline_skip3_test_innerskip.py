@@ -106,7 +106,7 @@ train_params = {
                      'noise_level_max': -60},
     "vocab_file": "data/baseline_chn_2000/dict/vocab.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/train_skip3/librivox-train.csv"
+      "data/baseline_chn_2000/train_bpe/librivox-train.csv"
     ],
     "shuffle": False,
   },
@@ -122,7 +122,7 @@ eval_params = {
     "cache_format": "kaldi",
     "vocab_file": "data/baseline_chn_2000/dict/vocab.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/dev_skip3/librivox-dev.csv"
+      "data/baseline_chn_2000/dev_bpe/librivox-dev.csv"
     ],
     "shuffle": False,
   },
