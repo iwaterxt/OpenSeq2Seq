@@ -22,7 +22,7 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe_layernorm",
+  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe_layernorm_new",
 
   "optimizer": "Momentum",
   "optimizer_params": {
@@ -47,13 +47,12 @@ base_params = {
   "encoder": DeepSpeech2Encoder,
   "encoder_params": {
 
-    "feat_layers": [
+    "feat_layers": 
       {
         "context": [-1, 0, 1],
         "skip_frames": 3,
         "layer_norm": True
       },
-    ],
 
     "conv_layers": [
       {
