@@ -448,12 +448,12 @@ class DeepSpeech2Encoder(Encoder):
         top_layer = tf.transpose(top_layer, [1, 0, 2])
         inner_skip_frames = rnn_layers['inner_skip_frames']
         if inner_skip_frames > 1:
-          source_sequence = subsample(
-                          input_layer = source_sequence,
+          top_layer = subsample(
+                          input_layer = top_layer,
                           regularizer = regularizer,
                           skip_frames = inner_skip_frames,
                           name = "subsample_inner")
-        src_length = (src_length + inner_skip_frames - 1) // inner_skip_frames 
+          src_length = (src_length + inner_skip_frames - 1) // inner_skip_frames 
 
       else:
         rnn_input = top_layer
@@ -490,8 +490,8 @@ class DeepSpeech2Encoder(Encoder):
           top_layer = tf.concat(top_layer, 2)
           inner_skip_frames = rnn_layers['inner_skip_frames']
           if inner_skip_frames > 1:
-            source_sequence = subsample(
-                            input_layer = source_sequence,
+            top_layer = subsample(
+                            input_layer = top_layer,
                             regularizer = regularizer,
                             skip_frames = inner_skip_frames,
                             name = "subsample_inner")
