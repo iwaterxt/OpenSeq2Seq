@@ -46,9 +46,18 @@ base_params = {
 
   "encoder": DeepSpeech2Encoder,
   "encoder_params": {
+
+    "feat_layers": [
+      {
+        "context": [-1, 0, 1],
+        "skip_frames": 3,
+        "layer_norm": True
+      },
+    ],
+
     "conv_layers": [
       {
-        "kernel_size": [11, 41], "stride": [2, 2],
+        "kernel_size": [11, 41], "stride": [1, 2],
         "num_channels": 32, "padding": "SAME"
       },
       {

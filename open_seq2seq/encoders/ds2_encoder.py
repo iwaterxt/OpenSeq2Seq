@@ -55,7 +55,24 @@ def splice(name, input_layer, context):
   return spliced
 
 def subsample(name, input_layer, regularizer, skip_frames=1):
+  '''
+  subsample a tensor along the time dimention 
+  e.g.:
+  t = [[[1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]]]
 
+  subsample_tensor(t, 2) = 
+      [[[1, 2, 3],
+        [7, 8, 9]]]
+  Args:
+    tensor: a tf.Tensor with shape (B T D) a.k.a (N, H, W)
+    skip_frames: a scalar of skip frames
+
+  Returns:
+    subsample tensor with shape (B, *, D)
+
+  '''
   if skip_frames > 1:
     T = tf.shape(input_layer)[1]
     input_shape = input_layer.get_shape().as_list()
@@ -165,6 +182,7 @@ class DeepSpeech2Encoder(Encoder):
   def get_required_params():
     return dict(Encoder.get_required_params(), **{
         'dropout_keep_prob': float,
+        'feat_layers': dict,
         'conv_layers': list,
         'activation_fn': None,  # any valid callable
         'num_rnn_layers': int,
@@ -182,7 +200,6 @@ class DeepSpeech2Encoder(Encoder):
     return dict(Encoder.get_optional_params(), **{
         'row_conv_width': int,
         'skip_frames':  int,
-        'layer_norm': bool,
         'proj_dim': int,
         'data_format': ['channels_first', 'channels_last', 'BCTF', 'BTFC', 'BCFT', 'BFTC'],
         'bn_momentum': float,
@@ -263,13 +280,29 @@ class DeepSpeech2Encoder(Encoder):
     training = (self._mode == "train")
     dropout_keep_prob = self.params['dropout_keep_prob'] if training else 1.0
     regularizer = self.params.get('regularizer', None)
-    skip_frames = self.params.get('skip_frames', 1)
-    layer_norm = self.params.get('layer_norm', False)
     proj_dim = self.params.get('proj_dim', None)
     data_format = self.params.get('data_format', 'channels_last')
     bn_momentum = self.params.get('bn_momentum', 0.99)
     bn_epsilon = self.params.get('bn_epsilon', 1e-3)
 
+
+    #-------------feature layer------------------------------------
+    feat_layers = self.params['feat_layers']
+    context = feat_layers['context']
+    skip_frames = feat_layers['skip_frames']
+    layer_norm = feat_layers['layer_norm']
+
+    if len(context) > 0:
+      source_sequence = splice(
+                          input_layer = source_sequence,
+                          context = context,
+                          name = "splice")
+    if skip_frames > 1:
+      source_sequence = subsample(
+                          input_layer = source_sequence,
+                          regularizer = regularizer,
+                          skip_frames = skip_frames,
+                          name = "subsample")
     if layer_norm:
       source_sequence = layer_normalize(
                           input_layer = source_sequence,
