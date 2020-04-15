@@ -411,14 +411,15 @@ class DeepSpeech2Encoder(Encoder):
     top_layer = tf.reshape(top_layer, [batch_size, -1, fc])
 
     # ----- RNN ---------------------------------------------------------------
-    num_rnn_layers = self.params['num_rnn_layers']
+    rnn_layers = self.params['rnn_layers']
+    num_rnn_layers = rnn_layers['num_rnn_layers']
     if num_rnn_layers > 0:
-      rnn_cell_dim = self.params['rnn_cell_dim']
-      rnn_type = self.params['rnn_type']
-      if self.params['use_cudnn_rnn']:
+      rnn_cell_dim = rnn_layers['rnn_cell_dim']
+      rnn_type = rnn_layers['rnn_type']
+      if rnn_layers['use_cudnn_rnn']:
         # reshape to [B, T, C] --> [T, B, C]
         rnn_input = tf.transpose(top_layer, [1, 0, 2])
-        if self.params['rnn_unidirectional']:
+        if rnn_layers['rnn_unidirectional']:
           direction = cudnn_rnn_ops.CUDNN_RNN_UNIDIRECTION
         else:
           direction = cudnn_rnn_ops.CUDNN_RNN_BIDIRECTION
@@ -447,9 +448,17 @@ class DeepSpeech2Encoder(Encoder):
           raise ValueError(
               "{} is not a valid rnn_type for cudnn_rnn layers".format(
                   rnn_type)
-          )
+          )  
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
+        inner_skip_frames = rnn_layers['inner_skip_frames']
+        if inner_skip_frames > 1:
+          source_sequence = subsample(
+                          input_layer = source_sequence,
+                          regularizer = regularizer,
+                          skip_frames = inner_skip_frames,
+                          name = "subsample_inner")
+        src_length = (src_length + inner_skip_frames - 1) // inner_skip_frames 
 
       else:
         rnn_input = top_layer
@@ -458,7 +467,8 @@ class DeepSpeech2Encoder(Encoder):
                       dropout_keep_prob=dropout_keep_prob, proj_dim=proj_dim)
              for _ in range(num_rnn_layers)]
         )
-        if self.params['rnn_unidirectional']:
+        
+        if rnn_layers['rnn_unidirectional']:
           top_layer, state = tf.nn.dynamic_rnn(
               cell=multirnn_cell_fw,
               inputs=rnn_input,
@@ -472,6 +482,7 @@ class DeepSpeech2Encoder(Encoder):
                         dropout_keep_prob=dropout_keep_prob)
                for _ in range(num_rnn_layers)]
           )
+
           top_layer, state = tf.nn.bidirectional_dynamic_rnn(
               cell_fw=multirnn_cell_fw, cell_bw=multirnn_cell_bw,
               inputs=rnn_input,
@@ -479,8 +490,17 @@ class DeepSpeech2Encoder(Encoder):
               dtype=rnn_input.dtype,
               time_major=False
           )
+
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
           top_layer = tf.concat(top_layer, 2)
+          inner_skip_frames = rnn_layers['inner_skip_frames']
+          if inner_skip_frames > 1:
+            source_sequence = subsample(
+                            input_layer = source_sequence,
+                            regularizer = regularizer,
+                            skip_frames = inner_skip_frames,
+                            name = "subsample_inner")
+          src_length = (src_length + inner_skip_frames - 1) // inner_skip_frames 
     # -- end of rnn------------------------------------------------------------
 
     if self.params['row_conv']:
