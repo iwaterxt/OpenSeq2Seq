@@ -89,7 +89,7 @@ def subsample(name, input_layer, regularizer, skip_frames=1):
         units=D,
         kernel_regularizer=regularizer,
         activation=None,
-        name='fully_connected',
+        name=name +'/fully_connected',
     )
     return input_layer
   else:
