@@ -57,7 +57,7 @@ base_params = {
 
     "conv_layers": [
       {
-        "kernel_size": [11, 41], "stride": [1, 2],
+        "kernel_size": [11, 41], "stride": [2, 2],
         "num_channels": 32, "padding": "SAME"
       },
       {
