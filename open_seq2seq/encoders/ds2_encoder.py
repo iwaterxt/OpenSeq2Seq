@@ -303,6 +303,8 @@ class DeepSpeech2Encoder(Encoder):
                           regularizer = regularizer,
                           skip_frames = skip_frames,
                           name = "subsample")
+      src_length = (src_length + skip_frames - 1) // skip_frames
+
     if layer_norm:
       source_sequence = layer_normalize(
                           input_layer = source_sequence,
@@ -448,14 +450,6 @@ class DeepSpeech2Encoder(Encoder):
           )
         top_layer, state = rnn_block(rnn_input)
         top_layer = tf.transpose(top_layer, [1, 0, 2])
-        # subsample
-        top_layer = subsample(
-              input_layer = top_layer,
-              regularizer = regularizer,
-              skip_frames = skip_frames,
-              name="subsample",
-        )
-        src_length = (src_length + skip_frames - 1) // skip_frames
 
       else:
         rnn_input = top_layer
@@ -487,14 +481,6 @@ class DeepSpeech2Encoder(Encoder):
           )
           # concat 2 tensors [B, T, n_cell_dim] --> [B, T, 2*n_cell_dim]
           top_layer = tf.concat(top_layer, 2)
-        # subsample
-        top_layer = subsample(
-            input_layer = top_layer,
-            regularizer = regularizer,
-            skip_frames = skip_frames,
-            name="subsample",
-        )
-        src_length = (src_length + skip_frames - 1) // skip_frames
     # -- end of rnn------------------------------------------------------------
 
     if self.params['row_conv']:
