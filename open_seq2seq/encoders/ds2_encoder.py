@@ -10,7 +10,7 @@ from open_seq2seq.parts.cnns.conv_blocks import conv_bn_actv
 from .encoder import Encoder
 
 
-def splice(name, input_layer, context):
+def splice(name, input_layer, context, skip_frames=1):
   '''
   Splice a tensor along the last dimension with context.
   e.g.:
@@ -52,6 +52,8 @@ def splice(name, input_layer, context):
   spliced = tf.transpose(spliced, (1, 2, 0, 3))
   spliced = tf.reshape(spliced, [B, T, D*context_len])
 
+  spliced = spliced[:, begin:end:skip_frames, :]
+  
   return spliced
 
 def subsample(name, input_layer, regularizer, skip_frames=1):
