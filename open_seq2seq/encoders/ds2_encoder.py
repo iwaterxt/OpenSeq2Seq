@@ -288,10 +288,6 @@ class DeepSpeech2Encoder(Encoder):
     context = feat_layers['context']
     skip_frames = feat_layers['skip_frames']
     layer_norm = feat_layers['layer_norm']
-    if layer_norm:
-      source_sequence = layer_normalize(
-                          input_layer = source_sequence,
-                          name = "layer_norm")
 
     if len(context) > 0:
       source_sequence = splice(
@@ -306,6 +302,10 @@ class DeepSpeech2Encoder(Encoder):
                           name = "subsample")
       src_length = (src_length + skip_frames - 1) // skip_frames
 
+    if layer_norm:
+      source_sequence = layer_normalize(
+                          input_layer = source_sequence,
+                          name = "layer_norm")
 
     input_layer = tf.expand_dims(source_sequence, axis=-1) # BTFC
     # print("<<< input   :", input_layer.get_shape().as_list())
