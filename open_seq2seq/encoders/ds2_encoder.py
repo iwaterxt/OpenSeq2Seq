@@ -52,7 +52,7 @@ def splice(name, input_layer, context, skip_frames=1):
   spliced = tf.transpose(spliced, (1, 2, 0, 3))
   spliced = tf.reshape(spliced, [B, T, D*context_len])
 
-  spliced = spliced[:, begin:end:skip_frames, :]
+  spliced = spliced[:, ::skip_frames, :]
   
   return spliced
 
@@ -289,23 +289,19 @@ class DeepSpeech2Encoder(Encoder):
     skip_frames = feat_layers['skip_frames']
     layer_norm = feat_layers['layer_norm']
 
-    if len(context) > 0:
-      source_sequence = splice(
-                          input_layer = source_sequence,
-                          context = context,
-                          name = "splice")
-    if skip_frames > 1:
-      source_sequence = subsample(
-                          input_layer = source_sequence,
-                          regularizer = regularizer,
-                          skip_frames = skip_frames,
-                          name = "subsample")
-      src_length = (src_length + skip_frames - 1) // skip_frames
-
     if layer_norm:
       source_sequence = layer_normalize(
                           input_layer = source_sequence,
                           name = "layer_norm")
+
+    if len(context) > 0:
+      source_sequence = splice(
+                          input_layer = source_sequence,
+                          context = context,
+                          skip_frames = skip_frames,
+                          name = "splice")
+
+      src_length = (src_length + skip_frames - 1) // skip_frames
 
     input_layer = tf.expand_dims(source_sequence, axis=-1) # BTFC
     # print("<<< input   :", input_layer.get_shape().as_list())
