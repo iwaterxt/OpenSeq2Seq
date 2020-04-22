@@ -19,7 +19,8 @@ base_params = {
   "batch_size_per_gpu": 20,
 
   "num_epochs": 50,
-
+  "src_vocab_size": 0, 
+  "remove_padding": False,
   "save_summaries_steps": 1000,
   "print_loss_steps": 10,
   "print_samples_steps": 10000,

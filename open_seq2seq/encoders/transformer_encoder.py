@@ -169,7 +169,11 @@ class TransformerEncoder(Encoder):
 
       # Prepare inputs to the layer stack by adding positional encodings and
       # applying dropout.
-      embedded_inputs = self.embedding_softmax_layer(inputs)
+      if self.params["src_vocab_size"] > 0:
+        embedded_inputs = self.embedding_softmax_layer(inputs)
+      else:
+        embedded_inputs = inputs
+      # Padding should be pay attention
       if self.params["remove_padding"]:
         inputs_padding = utils.get_padding(inputs)
         #inputs_padding = utils.get_padding(inputs,dtype=self._params["dtype"])
