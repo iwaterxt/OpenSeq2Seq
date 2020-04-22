@@ -73,8 +73,7 @@ base_params = {
       "inner_skip_frames": 1,
       "skip_layer": 4,
     },
-    "remove_padding": False,
-    "src_vocab_size": 0, 
+    "src_vocab_size": 120, 
   },
 
   "decoder": FullyConnectedCTCDecoder,
