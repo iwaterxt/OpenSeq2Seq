@@ -15,8 +15,8 @@ num_layers = 6
 base_params = {
   "random_seed": 0,
   "use_horovod": False,
-  "num_gpus": 4,
-  "batch_size_per_gpu": 20,
+  "num_gpus": 2,
+  "batch_size_per_gpu": 40,
 
   "num_epochs": 50,
 
