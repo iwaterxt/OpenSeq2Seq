@@ -150,13 +150,13 @@ class TransformerEncoder(Encoder):
       skip_frames = feat_layers['skip_frames']
       layer_norm = feat_layers['layer_norm']
       if layer_norm:
-        source_sequence = layer_normalize(
-                            input_layer = source_sequence,
+        inputs = layer_normalize(
+                            input_layer = inputs,
                             name = "layer_norm")
 
       if len(context) > 0:
-        source_sequence = splice(
-                            input_layer = source_sequence,
+        inputs = splice(
+                            input_layer = inputs,
                             context = context,
                             skip_frames = skip_frames,
                             name = "splice")
@@ -195,7 +195,7 @@ class TransformerEncoder(Encoder):
                            inputs_padding, inner_skip_frames, skip_layer)
       if inner_skip_frames > 1:
         src_lengths = (src_lengths + inner_skip_frames - 1) // inner_skip_frames
-      
+
       return {'outputs': encoded,
               'inputs_attention_bias': inputs_attention_bias,
               'state': None,
