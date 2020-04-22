@@ -156,10 +156,10 @@ class TransformerEncoder(Encoder):
 
       if len(context) > 0:
         inputs = splice(
-                            input_layer = inputs,
-                            context = context,
-                            skip_frames = skip_frames,
-                            name = "splice")
+                    input_layer = inputs,
+                    context = context,
+                    skip_frames = skip_frames,
+                    name = "splice")
 
       src_lengths = (src_lengths + skip_frames - 1) // skip_frames
 
@@ -172,7 +172,13 @@ class TransformerEncoder(Encoder):
       if self.params["src_vocab_size"] > 0:
         embedded_inputs = self.embedding_softmax_layer(inputs)
       else:
-        embedded_inputs = inputs
+        embedded_inputs = tf.layers.dense(
+                              inputs=inputs,
+                              units=self.params["hidden_size"],
+                              kernel_regularizer=self.regularizer,
+                              activation=None,
+                              name='fully_connected',
+                          )
       # Padding should be pay attention
       if self.params["remove_padding"]:
         inputs_padding = utils.get_padding(inputs)
