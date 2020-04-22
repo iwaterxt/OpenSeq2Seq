@@ -54,6 +54,12 @@ base_params = {
 
   "encoder": TransformerEncoder,
   "encoder_params": {
+    "feat_layers":
+    {
+        "context": [0],
+        "skip_frames": 1,
+        "layer_norm": False,
+    },
     "encoder_layers": num_layers,
     "hidden_size": d_model,
     "num_heads": 8,
@@ -63,6 +69,12 @@ base_params = {
     "layer_postprocess_dropout": 0.1,
     "pad_embeddings_2_eight": True,
     "remove_padding": True,
+    "inner_skip_params":
+    {
+      "inner_skip_frames": 1,
+      "skip_layer": 4,
+    },
+
   },
 
   "decoder": FullyConnectedCTCDecoder,

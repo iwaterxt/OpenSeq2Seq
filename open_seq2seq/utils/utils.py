@@ -488,6 +488,8 @@ def get_base_config(args):
                            "\"train_eval\" or \"infer\"")
   parser.add_argument("--infer_output_file", default='infer-out.txt',
                       help="Path to the output of inference")
+  parser.add_argument("--batch_size_per_gpu", type=int, default=0,
+                      help="batch size to inference")
   parser.add_argument('--continue_learning', dest='continue_learning',
                       action='store_true', help="whether to continue learning")
   parser.add_argument('--no_dir_check', dest='no_dir_check',

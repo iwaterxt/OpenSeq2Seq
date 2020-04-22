@@ -20,6 +20,9 @@ def main():
   # Parse args and create config
   args, base_config, base_model, config_module = get_base_config(sys.argv[1:])
 
+  if args.batch_size_per_gpu > 0 and args.mode == "infer":
+    base_config['batch_size_per_gpu'] = args.batch_size_per_gpu
+
   if args.mode == "interactive_infer":
     raise ValueError(
         "Interactive infer is meant to be run from an IPython",

@@ -8,6 +8,7 @@ import tensorflow as tf
 from six.moves import range
 
 from open_seq2seq.encoders import Encoder
+form open_seq2seq.encoders.ds_encoder import splice， subsample， layer_normalize
 from open_seq2seq.parts.transformer import attention_layer, ffn_layer, utils, \
                                            embedding_layer
 from open_seq2seq.parts.transformer.common import PrePostProcessingWrapper, \
@@ -29,6 +30,7 @@ class TransformerEncoder(Encoder):
     """
     return dict(Encoder.get_required_params(), **{
         "encoder_layers": int,
+        'feat_layers': dict,
         "hidden_size": int,
         "num_heads": int,
         "attention_dropout": float,
@@ -56,6 +58,7 @@ class TransformerEncoder(Encoder):
         'initializer_params': dict,
         'pad_embeddings_2_eight': bool,
         'norm_params': dict,
+        'inner_skip_params': dict,
     })
 
   def __init__(self, params, model, name="transformer_encoder", mode='train' ):
@@ -135,7 +138,31 @@ class TransformerEncoder(Encoder):
 
     # actual encoder part
     with tf.name_scope("encode"):
-      inputs = input_dict['source_tensors'][0]
+      inputs, src_lengths = input_dict['source_tensors']
+      #-------------feature layer------------------------------------
+      feat_layers = self.params['feat_layers']
+      context = feat_layers['context']
+      skip_frames = feat_layers['skip_frames']
+      layer_norm = feat_layers['layer_norm']
+      if layer_norm:
+        source_sequence = layer_normalize(
+                            input_layer = source_sequence,
+                            name = "layer_norm")
+
+      if len(context) > 0:
+        source_sequence = splice(
+                            input_layer = source_sequence,
+                            context = context,
+                            skip_frames = skip_frames,
+                            name = "splice")
+
+      src_length = (src_length + skip_frames - 1) // skip_frames
+
+      inner_skip_params = self.params['inner_skip_params']
+      inner_skip_frames = inner_skip_params['inner_skip_frames']
+      skip_layer        = inner_skip_frames['skip_layer']
+
+
       # Prepare inputs to the layer stack by adding positional encodings and
       # applying dropout.
       embedded_inputs = self.embedding_softmax_layer(inputs)
@@ -165,6 +192,6 @@ class TransformerEncoder(Encoder):
       return {'outputs': encoded,
               'inputs_attention_bias': inputs_attention_bias,
               'state': None,
-              'src_lengths': input_dict['source_tensors'][1],
+              'src_lengths': src_lengths,
               'embedding_softmax_layer': self.embedding_softmax_layer,
               'encoder_input': inputs}
