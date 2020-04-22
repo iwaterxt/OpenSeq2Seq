@@ -19,8 +19,6 @@ base_params = {
   "batch_size_per_gpu": 40,
 
   "num_epochs": 50,
-  "src_vocab_size": 0, 
-  "remove_padding": False,
   "save_summaries_steps": 1000,
   "print_loss_steps": 10,
   "print_samples_steps": 10000,
@@ -75,7 +73,8 @@ base_params = {
       "inner_skip_frames": 1,
       "skip_layer": 4,
     },
-
+    "remove_padding": False,
+    "src_vocab_size": 0, 
   },
 
   "decoder": FullyConnectedCTCDecoder,

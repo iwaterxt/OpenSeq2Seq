@@ -153,7 +153,7 @@ infer_params = {
     "input_type": "logfbank",
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/tests_skip3/ailab_tmjl_mangbiao_nov21_all/librivox-ailab_tmjl_mangbiao_nov21_all.csv",
+      "data/baseline_chn_2000/tests_skip3_bpe/ailab_tmjl_mangbiao_nov21_all/librivox-ailab_tmjl_mangbiao_nov21_all.csv",
     ],
     "shuffle": False,
   },
