@@ -8,7 +8,7 @@ import tensorflow as tf
 from six.moves import range
 
 from open_seq2seq.encoders import Encoder
-from open_seq2seq.encoders.ds_encoder import splice, subsample, layer_normalize
+from open_seq2seq.encoders.ds2_encoder import splice, subsample, layer_normalize
 from open_seq2seq.parts.transformer import attention_layer, ffn_layer, utils, \
                                            embedding_layer
 from open_seq2seq.parts.transformer.common import PrePostProcessingWrapper, \
