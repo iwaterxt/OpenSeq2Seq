@@ -78,7 +78,7 @@ class TransformerEncoder(Encoder):
         if self.regularizer_params['scale'] > 0.0 else None
 
 
-  def _call(self, encoder_inputs, attention_bias, inputs_padding):
+  def _call(self, encoder_inputs, attention_bias, inputs_padding, inner_skip_frames=1, skip_layer=1):
     for n, layer in enumerate(self.layers):
       # Run inputs through the sublayers.
       self_attention_layer = layer[0]
@@ -89,7 +89,12 @@ class TransformerEncoder(Encoder):
           encoder_inputs = self_attention_layer(encoder_inputs, attention_bias)
         with tf.variable_scope("ffn"):
           encoder_inputs = feed_forward_network(encoder_inputs, inputs_padding)
-
+      if inner_skip_frames > 1 and n == skip_layer:
+        encoder_inputs = subsample(
+                        input_layer = encoder_inputs,
+                        regularizer = self.regularizer,
+                        skip_frames = inner_skip_frames,
+                        name = "subsample_inner")
     return self.output_normalization(encoder_inputs)
 
   def _encode(self, input_dict):
@@ -156,12 +161,11 @@ class TransformerEncoder(Encoder):
                             skip_frames = skip_frames,
                             name = "splice")
 
-      src_length = (src_length + skip_frames - 1) // skip_frames
+      src_lengths = (src_lengths + skip_frames - 1) // skip_frames
 
       inner_skip_params = self.params['inner_skip_params']
       inner_skip_frames = inner_skip_params['inner_skip_frames']
       skip_layer        = inner_skip_frames['skip_layer']
-
 
       # Prepare inputs to the layer stack by adding positional encodings and
       # applying dropout.
@@ -188,7 +192,10 @@ class TransformerEncoder(Encoder):
         )
 
       encoded = self._call(encoder_inputs, inputs_attention_bias,
-                           inputs_padding)
+                           inputs_padding, inner_skip_frames, skip_layer)
+      if inner_skip_frames > 1:
+        src_lengths = (src_lengths + inner_skip_frames - 1) // inner_skip_frames
+      
       return {'outputs': encoded,
               'inputs_attention_bias': inputs_attention_bias,
               'state': None,
