@@ -22,7 +22,7 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe_layernorm_innerskip",
+  "logdir": "experiments/chn500/ds2_offline_skip3_bpe_layernorm_innerskip",
 
   "optimizer": "Momentum",
   "optimizer_params": {
@@ -76,7 +76,7 @@ base_params = {
         "rnn_type": "cudnn_gru",
         "rnn_unidirectional": False,
         "inner_skip_frames": 2
-     }
+     },
 
     "row_conv": True,
     "row_conv_width": 8,

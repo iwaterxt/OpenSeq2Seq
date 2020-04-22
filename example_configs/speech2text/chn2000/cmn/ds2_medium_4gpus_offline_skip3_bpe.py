@@ -13,21 +13,24 @@ base_params = {
   "random_seed": 0,
   "use_horovod": False,
   "num_gpus": 4,
-  "batch_size_per_gpu": 32,
+  "batch_size_per_gpu": 1,
 
-  "num_epochs": 50,
+  "num_epochs": 120,
 
   "save_summaries_steps": 1000,
   "print_loss_steps": 10,
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn500/base_000",
+  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe",
 
-  "optimizer": "Adam",
+  "optimizer": "Momentum",
+  "optimizer_params": {
+    "momentum": 0.90,
+  },
   "lr_policy": poly_decay,
   "lr_policy_params": {
-    "learning_rate": 0.0002,
+    "learning_rate": 0.001,
     "power": 0.5
   },
   # weight decay
@@ -43,6 +46,13 @@ base_params = {
 
   "encoder": DeepSpeech2Encoder,
   "encoder_params": {
+    "feat_layers":
+      {
+        "context": [0],
+        "skip_frames": 1,
+        "layer_norm": False
+      },
+
     "conv_layers": [
       {
         "kernel_size": [11, 41], "stride": [2, 2],
@@ -57,12 +67,16 @@ base_params = {
         "num_channels": 96, "padding": "SAME"
       },
     ],
-    "num_rnn_layers": 3,
-    "rnn_cell_dim": 1024,
 
-    "use_cudnn_rnn": True,
-    "rnn_type": "cudnn_gru",
-    "rnn_unidirectional": True,
+    "rnn_layers":
+      {
+        "num_rnn_layers": 3,
+        "rnn_cell_dim": 1024,
+        "use_cudnn_rnn": True,
+        "rnn_type": "cudnn_gru",
+        "rnn_unidirectional": False,
+        "inner_skip_frames": 1
+      },
 
     "row_conv": True,
     "row_conv_width": 8,
@@ -77,7 +91,7 @@ base_params = {
   "decoder": FullyConnectedCTCDecoder,
   "decoder_params": {
     "use_language_model": False,
-
+    "infer_logits_to_pickle": True,
     # params for decoding the sequence with language model
     "beam_width": 512,
     "alpha": 2.0,
@@ -86,7 +100,7 @@ base_params = {
     "decoder_library_path": "ctc_decoder_with_lm/libctc_decoder_with_kenlm.so",
     "lm_path": "language_model/4-gram.binary",
     "trie_path": "language_model/trie.binary",
-    "alphabet_config_path": "data/baseline_chn_500/dict/vocab.txt",
+    "alphabet_config_path": "data/baseline_chn_2000/dict/vocab_bpe.txt",
   },
   "loss": CTCLoss,
   "loss_params": {},
@@ -95,14 +109,17 @@ base_params = {
 train_params = {
   "data_layer": Speech2TextDataLayer,
   "data_layer_params": {
-    "num_audio_features": 160,
-    "input_type": "spectrogram",
+    "feat_format": "feat",
+    "num_audio_features": 120,
+    "input_type": "logfbank",
+    "chn": True,
+    "cache_format": "kaldi",
     "augmentation": {'time_stretch_ratio': 0.05,
                      'noise_level_min': -90,
                      'noise_level_max': -60},
-    "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
+    "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_500/train/librivox-train.csv"
+      "data/baseline_chn_2000/train_skip3_bpe/librivox-train.csv"
     ],
     "shuffle": False,
   },
@@ -111,11 +128,14 @@ train_params = {
 eval_params = {
   "data_layer": Speech2TextDataLayer,
   "data_layer_params": {
-    "num_audio_features": 160,
-    "input_type": "spectrogram",
-    "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
+    "feat_format": "feat",
+    "num_audio_features": 120,
+    "input_type": "logfbank",
+    "chn": True,
+    "cache_format": "kaldi",
+    "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_500/dev/librivox-dev.csv"
+      "data/baseline_chn_2000/dev_skip3_bpe/librivox-dev.csv"
     ],
     "shuffle": False,
   },
@@ -124,11 +144,14 @@ eval_params = {
 infer_params = {
   "data_layer": Speech2TextDataLayer,
   "data_layer_params": {
-    "num_audio_features": 160,
-    "input_type": "spectrogram",
-    "vocab_file": "data/baseline_chn_500/dict/vocab.txt",
+    "num_audio_features": 120,
+    "feat_format": "feat",
+    "chn": True,
+    "cache_format": "kaldi",
+    "input_type": "logfbank",
+    "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_500/dev/librivox-dev.csv"
+      "data/baseline_chn_2000/tests_skip3_bpe/ailab_tmp_asr_rand_0725_fix/librivox-ailab_tmp_asr_rand_0725_fix.csv",
     ],
     "shuffle": False,
   },

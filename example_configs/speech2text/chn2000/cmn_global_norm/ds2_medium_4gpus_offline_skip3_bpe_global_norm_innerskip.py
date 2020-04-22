@@ -22,7 +22,7 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe",
+  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe_global_norm_innerskip",
 
   "optimizer": "Momentum",
   "optimizer_params": {
@@ -46,9 +46,17 @@ base_params = {
 
   "encoder": DeepSpeech2Encoder,
   "encoder_params": {
+
+    "feat_layers": 
+      {
+        "context": [0],
+        "skip_frames": 1,
+        "layer_norm": False
+      },
+
     "conv_layers": [
       {
-        "kernel_size": [11, 41], "stride": [2, 2],
+        "kernel_size": [11, 41], "stride": [1, 2],
         "num_channels": 32, "padding": "SAME"
       },
       {
@@ -60,12 +68,15 @@ base_params = {
         "num_channels": 96, "padding": "SAME"
       },
     ],
-    "num_rnn_layers": 3,
-    "rnn_cell_dim": 1024,
-
-    "use_cudnn_rnn": True,
-    "rnn_type": "cudnn_gru",
-    "rnn_unidirectional": False,
+    "rnn_layers":
+     {
+        "num_rnn_layers": 3,
+        "rnn_cell_dim": 1024,
+        "use_cudnn_rnn": True,
+        "rnn_type": "cudnn_gru",
+        "rnn_unidirectional": False,
+        "inner_skip_frames": 2
+     },
 
     "row_conv": True,
     "row_conv_width": 8,
@@ -75,6 +86,8 @@ base_params = {
     "dropout_keep_prob": 0.5,
     "activation_fn": tf.nn.relu,
     "data_format": "channels_first",
+
+
   },
 
   "decoder": FullyConnectedCTCDecoder,
@@ -108,7 +121,7 @@ train_params = {
                      'noise_level_max': -60},
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/train_skip3_bpe/librivox-train.csv"
+      "data/baseline_chn_2000/train_skip3_bpe_globalnorm/librivox-train.csv"
     ],
     "shuffle": False,
   },
@@ -124,7 +137,7 @@ eval_params = {
     "cache_format": "kaldi",
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/dev_skip3_bpe/librivox-dev.csv"
+      "data/baseline_chn_2000/dev_skip3_bpe_globalnorm/librivox-dev.csv"
     ],
     "shuffle": False,
   },

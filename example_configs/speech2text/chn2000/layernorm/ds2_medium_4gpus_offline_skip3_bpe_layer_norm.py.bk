@@ -22,7 +22,7 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe_layernorm_new",
+  "logdir": "experiments/chn2000/ds2_offline_skip3_bpe_layernorm",
 
   "optimizer": "Momentum",
   "optimizer_params": {
@@ -47,12 +47,12 @@ base_params = {
   "encoder": DeepSpeech2Encoder,
   "encoder_params": {
 
-    "feat_layers": 
-      {
-        "context": [-1, 0, 1],
-        "skip_frames": 3,
-        "layer_norm": True
-      },
+    "feat_layers":
+    {
+      "context": [0],
+      "skip_frames": 1,
+      "layer_norm": True
+    },
 
     "conv_layers": [
       {
@@ -68,12 +68,16 @@ base_params = {
         "num_channels": 96, "padding": "SAME"
       },
     ],
-    "num_rnn_layers": 3,
-    "rnn_cell_dim": 1024,
-
-    "use_cudnn_rnn": True,
-    "rnn_type": "cudnn_gru",
-    "rnn_unidirectional": False,
+    "rnn_layers":
+    {
+      "num_rnn_layers": 3,
+      "rnn_cell_dim": 1024,
+      "use_cudnn_rnn": True,
+      "rnn_type": "cudnn_gru",
+      "rnn_type": "cudnn_gru",
+      "rnn_unidirectional": False,
+      "inner_skip_frames": 1
+    },
 
     "row_conv": True,
     "row_conv_width": 8,
@@ -118,7 +122,7 @@ train_params = {
                      'noise_level_max': -60},
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/train_bpe/librivox-train.csv"
+      "data/baseline_chn_2000/train_skip3_nonorm/librivox-train.csv"
     ],
     "shuffle": False,
   },
@@ -134,7 +138,7 @@ eval_params = {
     "cache_format": "kaldi",
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/dev_bpe/librivox-dev.csv"
+      "data/baseline_chn_2000/dev_skip3_nonorm/librivox-dev.csv"
     ],
     "shuffle": False,
   },
@@ -150,7 +154,7 @@ infer_params = {
     "input_type": "logfbank",
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/tests_skip3/ailab_tmjl_mangbiao_nov21_all/librivox-ailab_tmjl_mangbiao_nov21_all.csv",
+      "data/baseline_chn_2000/tests_skip3_nonorm/ailab_tmjl_mangbiao_dec11/librivox-ailab_tmjl_mangbiao_dec11.csv",
     ],
     "shuffle": False,
   },
