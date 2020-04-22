@@ -1,13 +1,16 @@
 # pylint: skip-file
 import tensorflow as tf
 from open_seq2seq.models import Speech2Text
-from open_seq2seq.encoders import DeepSpeech2Encoder
+from open_seq2seq.encoders import TransformerEncoder
 from open_seq2seq.decoders import FullyConnectedCTCDecoder
 from open_seq2seq.data import Speech2TextDataLayer
 from open_seq2seq.losses import CTCLoss
-from open_seq2seq.optimizers.lr_policies import poly_decay
+from open_seq2seq.optimizers.lr_policies import transformer_policy
 
 base_model = Speech2Text
+d_model = 512
+num_layers = 6
+
 
 base_params = {
   "random_seed": 0,
@@ -22,70 +25,44 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn500/ds2_offline_skip3_bpe_cmn",
+  "logdir": "experiments/chn500/transformer_offline_skip3_bpe_cmn",
 
-  "optimizer": "Momentum",
+  "optimizer": tf.contrib.opt.LazyAdamOptimizer,
   "optimizer_params": {
-    "momentum": 0.90,
+    "beta1": 0.9,
+    "beta2": 0.997,
+    "epsilon": 1e-09,
   },
-  "lr_policy": poly_decay,
+
+  "lr_policy": transformer_policy,
   "lr_policy_params": {
-    "learning_rate": 0.001,
-    "power": 0.5
+    "learning_rate": 2.0,
+    "warmup_steps": 8000,
+    "d_model": d_model,
   },
+
   # weight decay
   "regularizer": tf.contrib.layers.l2_regularizer,
   "regularizer_params": {
     'scale': 0.0005
   },
+
   "initializer": tf.contrib.layers.xavier_initializer,
 
   "summaries": ['learning_rate', 'variables', 'gradients', 'larc_summaries',
                 'variable_norm', 'gradient_norm', 'global_gradient_norm'],
 
-
-  "encoder": DeepSpeech2Encoder,
+  "encoder": TransformerEncoder,
   "encoder_params": {
-    "feat_layers":
-      {
-        "context": [0],
-        "skip_frames": 1,
-        "layer_norm": False
-      },
-
-    "conv_layers": [
-      {
-        "kernel_size": [11, 41], "stride": [2, 2],
-        "num_channels": 32, "padding": "SAME"
-      },
-      {
-        "kernel_size": [11, 21], "stride": [1, 2],
-        "num_channels": 64, "padding": "SAME"
-      },
-      {
-        "kernel_size": [11, 21], "stride": [1, 2],
-        "num_channels": 96, "padding": "SAME"
-      },
-    ],
-
-    "rnn_layers":
-      {
-        "num_rnn_layers": 3,
-        "rnn_cell_dim": 1024,
-        "use_cudnn_rnn": True,
-        "rnn_type": "cudnn_gru",
-        "rnn_unidirectional": False,
-        "inner_skip_frames": 1
-      },
-
-    "row_conv": True,
-    "row_conv_width": 8,
-
-    "n_hidden": 2048,
-
-    "dropout_keep_prob": 0.5,
-    "activation_fn": tf.nn.relu,
-    "data_format": "channels_first",
+    "encoder_layers": num_layers,
+    "hidden_size": d_model,
+    "num_heads": 8,
+    "attention_dropout": 0.1,
+    "filter_size": 4 * d_model,
+    "relu_dropout": 0.1,
+    "layer_postprocess_dropout": 0.1,
+    "pad_embeddings_2_eight": True,
+    "remove_padding": True,
   },
 
   "decoder": FullyConnectedCTCDecoder,
