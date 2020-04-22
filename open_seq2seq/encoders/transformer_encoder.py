@@ -165,7 +165,7 @@ class TransformerEncoder(Encoder):
 
       inner_skip_params = self.params['inner_skip_params']
       inner_skip_frames = inner_skip_params['inner_skip_frames']
-      skip_layer        = inner_skip_frames['skip_layer']
+      skip_layer        = inner_skip_params['skip_layer']
 
       # Prepare inputs to the layer stack by adding positional encodings and
       # applying dropout.
