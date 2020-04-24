@@ -300,7 +300,6 @@ class DeepSpeech2Encoder(Encoder):
                           context = context,
                           skip_frames = skip_frames,
                           name = "splice")
-
       src_length = (src_length + skip_frames - 1) // skip_frames
 
     input_layer = tf.expand_dims(source_sequence, axis=-1) # BTFC
