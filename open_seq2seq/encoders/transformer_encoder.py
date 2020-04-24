@@ -181,11 +181,11 @@ class TransformerEncoder(Encoder):
                           )
       # Padding should be pay attention
       if self.params["remove_padding"]:
-        inputs_padding = utils.get_padding(inputs)
+        inputs_padding = utils.get_padding(embedded_inputs)
         #inputs_padding = utils.get_padding(inputs,dtype=self._params["dtype"])
       else:
         inputs_padding = None
-      inputs_attention_bias = utils.get_padding_bias(inputs)
+      inputs_attention_bias = utils.get_padding_bias(embedded_inputs, 3)
       # inputs_attention_bias = utils.get_padding_bias(inputs, dtype=self._params["dtype"])
 
       with tf.name_scope("add_pos_encoding"):
@@ -209,6 +209,6 @@ class TransformerEncoder(Encoder):
       return {'outputs': encoded,
               'inputs_attention_bias': inputs_attention_bias,
               'state': None,
-              'src_lengths': src_lengths,
+              'src_length': src_lengths,
               'embedding_softmax_layer': self.embedding_softmax_layer,
               'encoder_input': inputs}

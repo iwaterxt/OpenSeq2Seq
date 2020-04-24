@@ -73,16 +73,15 @@ class Attention(tf.layers.Layer):
     Returns:
       A tensor with shape [batch_size, num_heads, length, hidden_size/num_heads]
     """
+    
     with tf.name_scope("split_heads"):
-      batch_size = tf.shape(x)[0]
+      batch_size = x.get_shape().as_list()[0]
       length = tf.shape(x)[1]
-
       # Calculate depth of last dimension after it has been split.
       depth = (self.hidden_size // self.num_heads)
 
       # Split the last dimension
       x = tf.reshape(x, [batch_size, length, self.num_heads, depth])
-
       # Transpose the result
       return tf.transpose(x, [0, 2, 1, 3])
 
@@ -96,7 +95,7 @@ class Attention(tf.layers.Layer):
       A tensor with shape [batch_size, length, hidden_size]
     """
     with tf.name_scope("combine_heads"):
-      batch_size = tf.shape(x)[0]
+      batch_size = x.get_shape().as_list()[0]
       length = tf.shape(x)[2]
       x = tf.transpose(x, [0, 2, 1, 3])  # --> [batch, length, num_heads, depth]
       return tf.reshape(x, [batch_size, length, self.hidden_size])
@@ -130,16 +129,13 @@ class Attention(tf.layers.Layer):
       # Combine cached keys and values with new keys and values.
       k = tf.concat([cache["k"], k], axis=1)
       v = tf.concat([cache["v"], v], axis=1)
-
       # Update cache
       cache["k"] = k
       cache["v"] = v
-
     # Split q, k, v into heads.
     q = self.split_heads(q)
     k = self.split_heads(k)
     v = self.split_heads(v)
-
     if self.mode == "loung":
       # Scale q to prevent the dot product between q and k from growing too large.
       depth = (self.hidden_size // self.num_heads)
@@ -183,7 +179,6 @@ class Attention(tf.layers.Layer):
 
           # Clipping
           bias = tf.maximum(bias, -1e9)
-
         logits += bias
         weights = tf.nn.softmax(logits, name="attention_weights")
     elif self.mode == "bahdanau":
@@ -207,11 +202,10 @@ class Attention(tf.layers.Layer):
         "Mode for multi-head attention must be either loung for dot-product",
         "attention, or bahdanau for content-based/additive/mlp-base attention"
       )
-
+    
     if self.train:
       weights = tf.nn.dropout(weights, keep_prob=1 - self.attention_dropout)
     attention_output = tf.matmul(weights, v)
-
     # Recombine heads --> [batch_size, length, hidden_size]
     attention_output = self.combine_heads(attention_output)
 
