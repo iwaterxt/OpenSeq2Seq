@@ -59,6 +59,7 @@ class TransformerEncoder(Encoder):
         'pad_embeddings_2_eight': bool,
         'norm_params': dict,
         'inner_skip_params': dict,
+        'task': None,
     })
 
   def __init__(self, params, model, name="transformer_encoder", mode='train' ):
@@ -95,7 +96,11 @@ class TransformerEncoder(Encoder):
                         regularizer = self.regularizer,
                         skip_frames = inner_skip_frames,
                         name = "subsample_inner")
-    return self.output_normalization(encoder_inputs)
+
+    if self.params["task"] == "ASR":
+        return encoder_inputs
+    else:
+        return self.output_normalization(encoder_inputs)
 
   def _encode(self, input_dict):
     training = (self.mode == "train")
@@ -180,13 +185,22 @@ class TransformerEncoder(Encoder):
                               name='fully_connected',
                           )
       # Padding should be pay attention
-      if self.params["remove_padding"]:
-        inputs_padding = utils.get_padding(embedded_inputs)
-        #inputs_padding = utils.get_padding(inputs,dtype=self._params["dtype"])
+      if self.params["task"] == "ASR":
+        if self.params["remove_padding"]:
+            inputs_padding = utils.get_padding(embedded_inputs)
+            #inputs_padding = utils.get_padding(inputs,dtype=self._params["dtype"])
+        else:
+            inputs_padding = None
+        inputs_attention_bias = utils.get_padding_bias(embedded_inputs)
+        print (inputs_attention_bias.get_shape().as_list())
+        # inputs_attention_bias = utils.get_padding_bias(inputs, dtype=self._params["dtype"])
       else:
-        inputs_padding = None
-      inputs_attention_bias = utils.get_padding_bias(embedded_inputs, 3)
-      # inputs_attention_bias = utils.get_padding_bias(inputs, dtype=self._params["dtype"])
+        if self.params["remove_padding"]:
+            inputs_padding = utils.get_padding(embedded_inputs[:,:,0])
+        else:
+            inputs_padding = None
+        inputs_attention_bias = utils.get_padding_bias(embedded_inputs[:,:,0])
+        print (inputs_attention_bias.get_shape().as_list())
 
       with tf.name_scope("add_pos_encoding"):
         length = tf.shape(embedded_inputs)[1]

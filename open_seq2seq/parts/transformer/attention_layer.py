@@ -179,7 +179,7 @@ class Attention(tf.layers.Layer):
 
           # Clipping
           bias = tf.maximum(bias, -1e9)
-        logits += bias
+          logits += bias
         weights = tf.nn.softmax(logits, name="attention_weights")
     elif self.mode == "bahdanau":
       att_v = tf.get_variable(
