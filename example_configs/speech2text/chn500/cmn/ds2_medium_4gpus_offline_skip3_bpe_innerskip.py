@@ -15,7 +15,7 @@ base_params = {
   "num_gpus": 4,
   "batch_size_per_gpu": 20,
 
-  "num_epochs": 120,
+  "num_epochs": 70,
 
   "save_summaries_steps": 1000,
   "print_loss_steps": 10,
@@ -121,7 +121,7 @@ train_params = {
                      'noise_level_max': -60},
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/train_skip3_bpe/librivox-train.csv"
+      "data/baseline_chn_500/train_cmn/librivox-train.csv"
     ],
     "shuffle": False,
   },
@@ -137,7 +137,7 @@ eval_params = {
     "cache_format": "kaldi",
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_2000/dev_skip3_bpe/librivox-dev.csv"
+      "data/baseline_chn_500/dev_cmn/librivox-dev.csv"
     ],
     "shuffle": False,
   },

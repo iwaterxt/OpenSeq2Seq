@@ -15,14 +15,14 @@ base_params = {
   "num_gpus": 4,
   "batch_size_per_gpu": 20,
 
-  "num_epochs": 50,
+  "num_epochs": 100,
 
   "save_summaries_steps": 1000,
   "print_loss_steps": 10,
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 1000,
-  "logdir": "experiments/chn500/ds2_offline_skip3_bpe_cmn",
+  "logdir": "experiments/chn500/ds2_offline_skip3_bpe_global_norm_innerskip",
 
   "optimizer": "Momentum",
   "optimizer_params": {
@@ -47,7 +47,7 @@ base_params = {
   "encoder": DeepSpeech2Encoder,
   "encoder_params": {
 
-    "feat_layers":
+    "feat_layers": 
       {
         "context": [0],
         "skip_frames": 1,
@@ -56,7 +56,7 @@ base_params = {
 
     "conv_layers": [
       {
-        "kernel_size": [11, 41], "stride": [2, 2],
+        "kernel_size": [11, 41], "stride": [1, 2],
         "num_channels": 32, "padding": "SAME"
       },
       {
@@ -68,16 +68,15 @@ base_params = {
         "num_channels": 96, "padding": "SAME"
       },
     ],
-
     "rnn_layers":
-      {
+     {
         "num_rnn_layers": 3,
         "rnn_cell_dim": 1024,
         "use_cudnn_rnn": True,
         "rnn_type": "cudnn_gru",
         "rnn_unidirectional": False,
-        "inner_skip_frames": 1
-      },
+        "inner_skip_frames": 2
+     },
 
     "row_conv": True,
     "row_conv_width": 8,
@@ -87,6 +86,8 @@ base_params = {
     "dropout_keep_prob": 0.5,
     "activation_fn": tf.nn.relu,
     "data_format": "channels_first",
+
+
   },
 
   "decoder": FullyConnectedCTCDecoder,
@@ -120,7 +121,7 @@ train_params = {
                      'noise_level_max': -60},
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_500/train_cmn/librivox-train.csv"
+      "data/baseline_chn_500/train_cmn_globalnorm/librivox-train.csv"
     ],
     "shuffle": False,
   },
@@ -136,7 +137,7 @@ eval_params = {
     "cache_format": "kaldi",
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_500/dev_cmn/librivox-dev.csv"
+      "data/baseline_chn_500/dev_cmn_globalnorm/librivox-dev.csv"
     ],
     "shuffle": False,
   },
@@ -152,7 +153,7 @@ infer_params = {
     "input_type": "logfbank",
     "vocab_file": "data/baseline_chn_2000/dict/vocab_bpe.txt",
     "dataset_files": [
-      "data/baseline_chn_500/tests_cmn/ailab_tmp_asr_rand_0725_fix/librivox-ailab_tmp_asr_rand_0725_fix.csv",
+      "data/baseline_chn_2000/tests_skip3/ailab_tmjl_mangbiao_nov21_all/librivox-ailab_tmjl_mangbiao_nov21_all.csv",
     ],
     "shuffle": False,
   },

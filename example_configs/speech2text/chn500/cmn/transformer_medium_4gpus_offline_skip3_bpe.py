@@ -8,14 +8,14 @@ from open_seq2seq.losses import CTCLoss
 from open_seq2seq.optimizers.lr_policies import transformer_policy
 
 base_model = Speech2Text
-d_model = 512
-num_layers = 6
+d_model = 384
+num_layers = 1
 
 
 base_params = {
   "random_seed": 0,
   "use_horovod": False,
-  "num_gpus": 2,
+  "num_gpus": 1,
   "batch_size_per_gpu": 40,
 
   "num_epochs": 50,
@@ -35,16 +35,16 @@ base_params = {
 
   "lr_policy": transformer_policy,
   "lr_policy_params": {
-    "learning_rate": 2.0,
-    "warmup_steps": 8000,
+    "learning_rate": 0.0001,
+    "warmup_steps": 40000,
     "d_model": d_model,
   },
 
   # weight decay
-  "regularizer": tf.contrib.layers.l2_regularizer,
-  "regularizer_params": {
-    'scale': 0.0005
-  },
+  #"regularizer": tf.contrib.layers.l2_regularizer,
+  #"regularizer_params": {
+  #  'scale': 0.0005
+  #},
 
   "initializer": tf.contrib.layers.xavier_initializer,
 
@@ -73,7 +73,8 @@ base_params = {
       "inner_skip_frames": 1,
       "skip_layer": 4,
     },
-    "src_vocab_size": 120, 
+    "src_vocab_size": 0,
+    "task": "ASR" 
   },
 
   "decoder": FullyConnectedCTCDecoder,
