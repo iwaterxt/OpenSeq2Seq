@@ -97,10 +97,10 @@ class TransformerEncoder(Encoder):
                         skip_frames = inner_skip_frames,
                         name = "subsample_inner")
 
-    if self.params["task"] == "ASR":
-        return encoder_inputs
-    else:
-        return self.output_normalization(encoder_inputs)
+#    if self.params["task"] == "ASR":
+#        return encoder_inputs
+#    else:
+    return self.output_normalization(encoder_inputs)
 
   def _encode(self, input_dict):
     training = (self.mode == "train")
