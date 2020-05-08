@@ -121,6 +121,7 @@ class TransformerEncoder(Encoder):
           train=training,
           regularizer=self.regularizer
         )
+
         feed_forward_network = ffn_layer.FeedFowardNetwork(
           hidden_size=self.params["hidden_size"],
           filter_size=self.params["filter_size"],
@@ -187,11 +188,11 @@ class TransformerEncoder(Encoder):
       # Padding should be pay attention
       if self.params["task"] == "ASR":
         if self.params["remove_padding"]:
-            inputs_padding = utils.get_padding(embedded_inputs[:,:,0])
+            inputs_padding = utils.get_padding(inputs[:,:,0])
             #inputs_padding = utils.get_padding(inputs,dtype=self._params["dtype"])
         else:
             inputs_padding = None
-        inputs_attention_bias = utils.get_padding_bias(embedded_inputs[:,:,0])
+        inputs_attention_bias = utils.get_padding_bias(inputs[:,:,0])
         # inputs_attention_bias = utils.get_padding_bias(inputs, dtype=self._params["dtype"])
       else:
         if self.params["remove_padding"]:
