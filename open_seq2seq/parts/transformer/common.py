@@ -86,6 +86,7 @@ class PrePostProcessingWrapper(object):
   def __init__(self, layer, params, training):
     self.layer = layer
     self.postprocess_dropout = params["layer_postprocess_dropout"]
+    self.task = params["task"]
     self.training = training
     self.norm_params = params.get("norm_params", {"type": "layernorm_L2"})
     # Create normalization layer
@@ -98,7 +99,7 @@ class PrePostProcessingWrapper(object):
 
   def __call__(self, x, *args, **kwargs):
 
-    if self.params["task"] == "ASR":
+    if self.task == "ASR":
       y = self.layer(x, *args, **kwargs)
       # Postprocessing: dropout and residual connection
       if self.training:
