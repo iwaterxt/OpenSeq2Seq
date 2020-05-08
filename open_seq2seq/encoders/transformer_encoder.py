@@ -189,11 +189,9 @@ class TransformerEncoder(Encoder):
       if self.params["task"] == "ASR":
         if self.params["remove_padding"]:
             inputs_padding = utils.get_padding(inputs[:,:,0])
-            #inputs_padding = utils.get_padding(inputs,dtype=self._params["dtype"])
         else:
             inputs_padding = None
         inputs_attention_bias = utils.get_padding_bias(inputs[:,:,0])
-        # inputs_attention_bias = utils.get_padding_bias(inputs, dtype=self._params["dtype"])
       else:
         if self.params["remove_padding"]:
             inputs_padding = utils.get_padding(embedded_inputs)
