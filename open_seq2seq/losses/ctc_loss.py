@@ -65,7 +65,7 @@ class CTCLoss(Loss):
             }
 
     Returns:
-      averaged CTC loss.
+      averaged CTC loss and token acc.
     """
     logits = input_dict['decoder_output']['logits']
     tgt_sequence, tgt_length = input_dict['target_tensors']
@@ -86,4 +86,10 @@ class CTCLoss(Loss):
 
     # Calculate the average loss across the batch
     avg_loss = tf.reduce_mean(total_loss)
+
+    #Calculate the averge token_acc across the batch
+    ctc_out_decoder_sparse = tf.nn.ctc_greedy_decoder(logits, src_length)
+
+    token_acc = 1 - tf.reduce_mean(tf.edit_distance(tf.cast(ctc_out_decoder_sparse[0][0], tf.int32), dense_to_sparse(tgt_sequence, tgt_length)))
+
     return avg_loss

@@ -97,10 +97,20 @@ class PrePostProcessingWrapper(object):
                                      params=self.norm_params)
 
   def __call__(self, x, *args, **kwargs):
-    # Preprocessing: normalization
-    y = self.norm(x)
-    y = self.layer(y, *args, **kwargs)
-    # Postprocessing: dropout and residual connection
-    if self.training:
-      y = tf.nn.dropout(y, keep_prob=1 - self.postprocess_dropout)
-    return x + y
+
+    if self.params["task"] == "ASR":
+      y = self.layer(x, *args, **kwargs)
+      # Postprocessing: dropout and residual connection
+      if self.training:
+        y = tf.nn.dropout(y, keep_prob=1 - self.postprocess_dropout)
+      y = y + x
+      y = self.norm(y)
+      return y
+    else:
+      # Preprocessing: normalization
+      y = self.norm(x)
+      y = self.layer(y, *args, **kwargs)
+      # Postprocessing: dropout and residual connection
+      if self.training:
+        y = tf.nn.dropout(y, keep_prob=1 - self.postprocess_dropout)
+      return x + y
