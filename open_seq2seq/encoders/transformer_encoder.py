@@ -31,8 +31,9 @@ class TransformerEncoder(Encoder):
     """
     return dict(Encoder.get_required_params(), **{
         "encoder_layers": int,
-        'feat_layers': dict,
-        'conv_layers': list,
+        "feat_layers": dict,
+        "conv_layers": list,
+        "activation_fn": None,  # any valid callable
         "hidden_size": int,
         "num_heads": int,
         "attention_dropout": float,
