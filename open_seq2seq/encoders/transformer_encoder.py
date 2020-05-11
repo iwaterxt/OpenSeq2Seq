@@ -251,7 +251,7 @@ class TransformerEncoder(Encoder):
             activation_fn=self.params['activation_fn'],
             strides=strides,
             padding=padding,
-            regularizer=regularizer,
+            regularizer=self.regularizer,
             training=training,
             data_format=dformat,
             bn_momentum=bn_momentum,
