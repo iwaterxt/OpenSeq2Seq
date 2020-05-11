@@ -157,20 +157,20 @@ class TransformerEncoder(Encoder):
 
     # actual encoder part
     with tf.name_scope("encode"):
-      inputs, src_lengths = input_dict['source_tensors']
+      feats, src_lengths = input_dict['source_tensors']
       #-------------feature layer------------------------------------
       feat_layers = self.params['feat_layers']
       context = feat_layers['context']
       skip_frames = feat_layers['skip_frames']
       layer_norm = feat_layers['layer_norm']
       if layer_norm:
-        inputs = layer_normalize(
-                            input_layer = inputs,
+        feats = layer_normalize(
+                            input_layer = feats,
                             name = "layer_norm")
 
       if len(context) > 0:
-        inputs = splice(
-                    input_layer = inputs,
+        feats = splice(
+                    input_layer = feats,
                     context = context,
                     skip_frames = skip_frames,
                     name = "splice")
@@ -181,7 +181,7 @@ class TransformerEncoder(Encoder):
       inner_skip_frames = inner_skip_params['inner_skip_frames']
       skip_layer        = inner_skip_params['skip_layer']
 
-      input_layer = tf.expand_dims(inputs, axis=-1) # BTFC
+      input_layer = tf.expand_dims(feats, axis=-1) # BTFC
 
       batch_size = input_layer.get_shape().as_list()[0] #number of streams
       freq = input_layer.get_shape().as_list()[2] #feature dim
@@ -291,10 +291,10 @@ class TransformerEncoder(Encoder):
       # Padding should be pay attention
       if self.params["task"] == "ASR":
         if self.params["remove_padding"]:
-            inputs_padding = utils.get_padding(tf.squeeze(inputs[:,:,0]))
+            inputs_padding = utils.get_padding(tf.squeeze(feats[:,:,0]))
         else:
             inputs_padding = None
-        inputs_attention_bias = utils.get_padding_bias(tf.squeeze(inputs[:,:,0]))
+        inputs_attention_bias = utils.get_padding_bias(tf.squeeze(feats[:,:,0]))
       else:
         if self.params["remove_padding"]:
             inputs_padding = utils.get_padding(embedded_inputs)

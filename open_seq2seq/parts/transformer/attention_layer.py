@@ -95,7 +95,7 @@ class Attention(tf.layers.Layer):
       A tensor with shape [batch_size, length, hidden_size]
     """
     with tf.name_scope("combine_heads"):
-      batch_size = tf.shape(x)[0] #x.get_shape().as_list()[0]
+      batch_size = x.get_shape().as_list()[0]
       length = tf.shape(x)[2]
       x = tf.transpose(x, [0, 2, 1, 3])  # --> [batch, length, num_heads, depth]
       return tf.reshape(x, [batch_size, length, self.hidden_size])
