@@ -231,10 +231,10 @@ class TransformerEncoder(Encoder):
         padding = conv_layers[idx_conv]['padding']
 
         if padding == "VALID":
-          src_length = (src_length - kernel_size[0] + strides[0]) // strides[0]
+          src_lengths = (src_lengths - kernel_size[0] + strides[0]) // strides[0]
           freq = (freq - kernel_size[1] + strides[1]) // strides[1]
         else:
-          src_length = (src_length + strides[0] - 1) // strides[0]
+          src_lengths = (src_lengths + strides[0] - 1) // strides[0]
           freq = (freq + strides[1] -1) // strides[1]
 
         if layout == 'BFTC' or layout == 'BCFT':
