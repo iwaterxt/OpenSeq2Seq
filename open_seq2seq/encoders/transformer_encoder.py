@@ -291,10 +291,10 @@ class TransformerEncoder(Encoder):
       # Padding should be pay attention
       if self.params["task"] == "ASR":
         if self.params["remove_padding"]:
-            inputs_padding = utils.get_padding(tf.squeeze(feats[:,:,0]))
+            inputs_padding = utils.get_padding(tf.squeeze(embedded_inputs[:,:,0]))
         else:
             inputs_padding = None
-        inputs_attention_bias = utils.get_padding_bias(tf.squeeze(feats[:,:,0]))
+        inputs_attention_bias = utils.get_padding_bias(tf.squeeze(embedded_inputs[:,:,0]))
       else:
         if self.params["remove_padding"]:
             inputs_padding = utils.get_padding(embedded_inputs)
