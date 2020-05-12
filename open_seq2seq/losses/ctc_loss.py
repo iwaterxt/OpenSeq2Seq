@@ -92,4 +92,4 @@ class CTCLoss(Loss):
 
     token_acc = 1 - tf.reduce_mean(tf.edit_distance(ctc_out_decoder_sparse, dense_to_sparse(tgt_sequence, tgt_length)))
 
-    return avg_loss
+    return token_acc
