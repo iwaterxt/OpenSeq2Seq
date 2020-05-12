@@ -199,7 +199,24 @@ def transformer_policy(global_step, learning_rate, d_model, warmup_steps,
   new_lr = decay * learning_rate
   if max_lr is not None:
     return tf.minimum(max_lr, new_lr)
-  print ("the learning_rate is: %f", new_lr)
+  return new_lr
+
+def transformer_police_asr(global_step, min_lr, learning_rate, 
+                          warmup_steps, all_steps, dtype=tf.float32):
+'''
+  Args:
+    global_step: global step TensorFlow tensor 
+    learning_rate (float): initial learning rate to use.
+    min_lr: minimum learning rate to use.
+    warmup_steps (int): number of warm-up steps.
+    all_steps: number of epochs mul number of steps per epoch
+'''
+  start_lr = tf.cond(global_step <= warmup_steps, lambda: learning_rate * (tf.cast(global_step, dtype)/warmup_steps), lambda: learning_rate)
+  def adapt():
+    unit_cycle = (1 + tf.cos(tf.cast(global_step,dtype) * tf.cast(math.pi,dtype) / all_steps)) / 2
+    adjusted_cycle = (unit_cycle * (start_lr - min_lr)) + min_lr
+    return adjusted_cycle
+  new_lr = tf.cond(global_step <= all_steps, adapt, lambda: min_lr)
   return new_lr
 
 def inv_poly_decay(global_step, learning_rate, decay_steps, min_lr,
