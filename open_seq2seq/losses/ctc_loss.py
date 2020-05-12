@@ -91,7 +91,5 @@ class CTCLoss(Loss):
     ctc_out_decoder_sparse = tf.nn.ctc_greedy_decoder(logits, src_length)
 
     token_acc = 1 - tf.reduce_mean(tf.edit_distance(tf.cast(ctc_out_decoder_sparse[0][0], tf.int32), dense_to_sparse(tgt_sequence, tgt_length)))
-    with tf.Session() as sess:
-      print_op = tf.print(token_acc, [token_acc])
-      sess.run(print_op)
+    
     return avg_loss
