@@ -201,7 +201,7 @@ def transformer_policy(global_step, learning_rate, d_model, warmup_steps,
     return tf.minimum(max_lr, new_lr)
   return new_lr
 
-def transformer_police_asr(global_step, min_lr, learning_rate, 
+def transformer_policy_asr(global_step, min_lr, learning_rate, 
                           warmup_steps, all_steps, dtype=tf.float32):
   """
   Args:
