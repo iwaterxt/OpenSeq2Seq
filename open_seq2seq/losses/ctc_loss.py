@@ -90,6 +90,6 @@ class CTCLoss(Loss):
     #Calculate the averge token_acc across the batch
     ctc_out_decoder_sparse = tf.nn.ctc_greedy_decoder(logits, src_length)
 
-    token_acc = 1 - tf.reduce_mean(tf.edit_distance(ctc_out_decoder_sparse, dense_to_sparse(tgt_sequence, tgt_length)))
+    token_acc = 1 - tf.reduce_mean(tf.edit_distance(ctc_out_decoder_sparse[0], dense_to_sparse(tgt_sequence, tgt_length)))
 
     return token_acc
