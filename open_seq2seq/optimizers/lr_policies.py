@@ -199,6 +199,7 @@ def transformer_policy(global_step, learning_rate, d_model, warmup_steps,
   new_lr = decay * learning_rate
   if max_lr is not None:
     return tf.minimum(max_lr, new_lr)
+  print ("the learning_rate is: %f", new_lr)
   return new_lr
 
 def inv_poly_decay(global_step, learning_rate, decay_steps, min_lr,

@@ -211,7 +211,7 @@ class Attention(tf.layers.Layer):
     attention_output = self.combine_heads(attention_output)
 
     # Run the combined outputs through another linear projection layer.
-    # attention_output = self.output_dense_layer(attention_output)
+    attention_output = self.output_dense_layer(attention_output)
     return attention_output
 
 

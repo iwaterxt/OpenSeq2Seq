@@ -103,7 +103,7 @@ class PrePostProcessingWrapper(object):
       y = self.layer(x, *args, **kwargs)
       # Postprocessing: dropout and residual connection
       #if self.training:
-      #  y = tf.nn.dropout(y, keep_prob=1 - self.postprocess_dropout)
+      y = tf.nn.dropout(y, keep_prob=1 - self.postprocess_dropout)
       y = y + x
       y = self.norm(y)
       return y
