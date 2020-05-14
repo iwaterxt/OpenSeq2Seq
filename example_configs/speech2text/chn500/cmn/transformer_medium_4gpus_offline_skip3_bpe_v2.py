@@ -6,19 +6,19 @@ from open_seq2seq.encoders import TransformerEncoderAsr
 from open_seq2seq.decoders import FullyConnectedCTCDecoder
 from open_seq2seq.data import Speech2TextDataLayer
 from open_seq2seq.losses import CTCLoss
-from open_seq2seq.optimizers.lr_policies import transformer_policy_asr
+from open_seq2seq.optimizers.lr_policies import transformer_policy
 from open_seq2seq.optimizers.lr_policies import poly_decay
 
 base_model = Speech2Text
-d_model = 2048
+d_model = 512
 num_layers = 6
 
 
 base_params = {
   "random_seed": 0,
   "use_horovod": False,
-  "num_gpus": 4,
-  "batch_size_per_gpu": 20,
+  "num_gpus": 1,
+  "batch_size_per_gpu": 32,
 
   "num_epochs": 50,
   "save_summaries_steps": 1000,
@@ -26,7 +26,7 @@ base_params = {
   "print_samples_steps": 10000,
   "eval_steps": 10000,
   "save_checkpoint_steps": 5000,
-  "logdir": "experiments/chn500/transformer_asr_offline_skip3_bpe_cmn_6_new",
+  "logdir": "experiments/chn500/transformer_asr_offline_skip3_bpe_cmn_6_learn_lr1_baseline",
 
   "optimizer": "Adam",
   "optimizer_params": {
@@ -35,19 +35,18 @@ base_params = {
     "epsilon": 1e-09,
   },
 
-  "lr_policy": transformer_policy_asr,
+  "lr_policy": transformer_policy,
   "lr_policy_params": {
-    "learning_rate": 0.0005,
-    "warmup_steps": 40000,
-    "all_steps":500000,
-    "min_lr": 0.000001
+    "learning_rate": 1.0,
+    "warmup_steps": 25000,
+    "d_model": d_model,
   },
 
   # weight decay
-  "regularizer": tf.contrib.layers.l2_regularizer,
-  "regularizer_params": {
-    'scale': 0.00001
-  },
+  #"regularizer": tf.contrib.layers.l2_regularizer,
+  #"regularizer_params": {
+  #  'scale': 0.00001
+  #},
 
   "initializer": tf.contrib.layers.xavier_initializer,
 
@@ -78,18 +77,18 @@ base_params = {
     "hidden_size": d_model,
     "num_heads": 8,
     "attention_dropout": 0.1,
-    "filter_size": 4 * d_model,
+    "filter_size": 4*d_model,
     "relu_dropout": 0.1,
     "layer_postprocess_dropout": 0.1,
     "pad_embeddings_2_eight": True,
     "remove_padding": True,
+    "src_vocab_size": 0,
+    "task": "ASR", 
     "inner_skip_params":
     {
       "inner_skip_frames": 1,
       "skip_layer": 4,
     },
-    "src_vocab_size": 0,
-    "task": "ASR" 
   },
 
   "decoder": FullyConnectedCTCDecoder,
