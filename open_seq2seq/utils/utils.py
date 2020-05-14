@@ -775,7 +775,7 @@ def create_logdir(args, base_config):
   with open(os.path.join(logdir, 'git-info_{}.log'.format(tm_suf)),
             'w') as f:
     f.write('commit hash: {}'.format(get_git_hash()))
-    f.write(get_git_diff())
+    f.write(str(get_git_diff().encode('utf-8')))
 
   old_stdout = sys.stdout
   old_stderr = sys.stderr
