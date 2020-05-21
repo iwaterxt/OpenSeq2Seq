@@ -309,7 +309,7 @@ class TransformerEncoder(Encoder):
       with tf.name_scope("add_pos_encoding"):
         length = tf.shape(embedded_inputs)[1]
         pos_encoding = utils.get_position_encoding(
-            length, self.params["hidden_size"],
+            length, self.params["adim_size"],
         )
         encoder_inputs = embedded_inputs + tf.cast(x=pos_encoding,
                                                    dtype=embedded_inputs.dtype)
