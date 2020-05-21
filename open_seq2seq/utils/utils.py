@@ -316,7 +316,7 @@ class Logger(object):
 
   def write(self, msg):
     self.stream.write(msg)
-    self.log.write(msg)
+    self.log.write(str(msg.encode('utf-8')))
 
   def flush(self):
     self.stream.flush()
