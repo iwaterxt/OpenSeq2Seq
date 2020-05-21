@@ -118,7 +118,7 @@ class TransformerEncoder(Encoder):
     if len(self.layers) == 0:
       # prepare encoder graph
       self.embedding_softmax_layer = embedding_layer.EmbeddingSharedWeights(
-          self.params["src_vocab_size"], self.params["adim"],
+          self.params["src_vocab_size"], self.params["adim_size"],
           pad_vocab_to_eight=self.params.get('pad_embeddings_2_eight', False),
       )
 
@@ -134,6 +134,7 @@ class TransformerEncoder(Encoder):
         )
 
         feed_forward_network = ffn_layer.FeedFowardNetwork(
+          adim_size=self.params["adim_size"],
           pdim_size=self.params["pdim_size"],
           filter_size=self.params["filter_size"],
           relu_dropout=self.params["relu_dropout"],
@@ -156,7 +157,7 @@ class TransformerEncoder(Encoder):
           params=self.norm_params)
       else:
         self.output_normalization = LayerNormalization(
-          hidden_size=self.params["hidden_size"], params=self.norm_params)
+          hidden_size=self.params["adim_size"], params=self.norm_params)
 
     # actual encoder part
     with tf.name_scope("encode"):
