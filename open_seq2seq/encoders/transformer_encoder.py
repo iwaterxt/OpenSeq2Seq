@@ -35,6 +35,8 @@ class TransformerEncoder(Encoder):
         "conv_layers": list,
         "activation_fn": None,  # any valid callable
         "hidden_size": int,
+        "adim_size": int,
+        "pdim_size": int,
         "num_heads": int,
         "attention_dropout": float,
         "filter_size": int,
@@ -116,7 +118,7 @@ class TransformerEncoder(Encoder):
     if len(self.layers) == 0:
       # prepare encoder graph
       self.embedding_softmax_layer = embedding_layer.EmbeddingSharedWeights(
-          self.params["src_vocab_size"], self.params["hidden_size"],
+          self.params["src_vocab_size"], self.params["adim"],
           pad_vocab_to_eight=self.params.get('pad_embeddings_2_eight', False),
       )
 
@@ -124,6 +126,7 @@ class TransformerEncoder(Encoder):
         # Create sublayers for each layer.
         self_attention_layer = attention_layer.SelfAttention(
           hidden_size=self.params["hidden_size"],
+          adim_size = self.params["pdim_size"],
           num_heads=self.params["num_heads"],
           attention_dropout=self.params["attention_dropout"],
           train=training,
@@ -131,7 +134,7 @@ class TransformerEncoder(Encoder):
         )
 
         feed_forward_network = ffn_layer.FeedFowardNetwork(
-          hidden_size=self.params["hidden_size"],
+          pdim_size=self.params["pdim_size"],
           filter_size=self.params["filter_size"],
           relu_dropout=self.params["relu_dropout"],
           train=training,
@@ -283,7 +286,7 @@ class TransformerEncoder(Encoder):
       else:
         embedded_inputs = tf.layers.dense(
                               inputs=inputs,
-                              units=self.params["hidden_size"],
+                              units=self.params["adim_size"],
                               kernel_regularizer=self.regularizer,
                               activation=None,
                               name='fully_connected',

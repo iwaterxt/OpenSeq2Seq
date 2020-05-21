@@ -24,9 +24,10 @@ import tensorflow as tf
 class FeedFowardNetwork(tf.layers.Layer):
   """Fully connected feedforward network."""
 
-  def __init__(self, hidden_size, filter_size, relu_dropout, train, regularizer=None):
+  def __init__(self, adim_size, pdim_size, filter_size, relu_dropout, train, regularizer=None):
     super(FeedFowardNetwork, self).__init__()
-    self.hidden_size = hidden_size
+    self.adim_size = adim_size
+    self.pdim_size = pdim_size
     self.filter_size = filter_size
     self.relu_dropout = relu_dropout
     self.train = train
@@ -42,7 +43,7 @@ class FeedFowardNetwork(tf.layers.Layer):
         bias_regularizer=regularizer
     )
     self.output_dense_layer = tf.layers.Dense(
-        hidden_size,
+        adim_size,
         use_bias=True,
         name="output_layer",
         kernel_regularizer=regularizer,
@@ -61,11 +62,11 @@ class FeedFowardNetwork(tf.layers.Layer):
         nonpad_ids = tf.cast(tf.where(pad_mask < 1e-9), dtype=tf.int32)
 
         # Reshape x to [batch_size*length, hidden_size] to remove padding
-        x = tf.reshape(x, [-1, self.hidden_size])
+        x = tf.reshape(x, [-1, self.pdim_size])
         x = tf.gather_nd(x, indices=nonpad_ids)
 
         # Reshape x from 2 dimensions to 3 dimensions.
-        x.set_shape([None, self.hidden_size])
+        x.set_shape([None, self.pdim_size])
         x = tf.expand_dims(x, axis=0)
 
     output = self.filter_dense_layer(x)
@@ -79,8 +80,8 @@ class FeedFowardNetwork(tf.layers.Layer):
         output = tf.scatter_nd(
             indices=nonpad_ids,
             updates=output,
-            shape=[batch_size * length, self.hidden_size]
+            shape=[batch_size * length, self.adim_size]
         )
-        output = tf.reshape(output, [batch_size, length, self.hidden_size])
+        output = tf.reshape(output, [batch_size, length, self.adim_size])
     return output
 

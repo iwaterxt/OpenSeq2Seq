@@ -27,6 +27,7 @@ class Attention(tf.layers.Layer):
   def __init__(
           self,
           hidden_size,
+          pdim_size,
           num_heads,
           attention_dropout,
           train,
@@ -41,6 +42,7 @@ class Attention(tf.layers.Layer):
 
     super(Attention, self).__init__()
     self.hidden_size = hidden_size
+    self.pdim_size = pdim_size
     self.num_heads = num_heads
     self.attention_dropout = attention_dropout
     self.train = train
@@ -57,7 +59,7 @@ class Attention(tf.layers.Layer):
                                          kernel_regularizer=regularizer)
     self.v_dense_layer = tf.layers.Dense(hidden_size, use_bias=False, name="v",
                                          kernel_regularizer=regularizer)
-    self.output_dense_layer = tf.layers.Dense(hidden_size, use_bias=False,
+    self.output_dense_layer = tf.layers.Dense(pdim_size, use_bias=False,
                                               name="output_transform",
                                               kernel_regularizer=regularizer)
 
