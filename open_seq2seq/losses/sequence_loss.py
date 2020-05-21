@@ -46,8 +46,7 @@ class BasicSequenceLoss(Loss):
     self._tgt_vocab_size = self.params["tgt_vocab_size"]
     self._batch_size = self.params["batch_size"]
     self._offset_target_by_one = self.params.get("offset_target_by_one", True)
-    self._average_across_timestep = self.params.get("average_across_timestep",
-                                                    False)
+    self._average_across_timestep = self.params.get("average_across_timestep", False)
     self._do_mask = self.params.get("do_mask", True)
 
   def _compute_loss(self, input_dict):
