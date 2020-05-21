@@ -27,6 +27,7 @@ class Attention(tf.layers.Layer):
   def __init__(
           self,
           hidden_size,
+          adim_size,
           pdim_size,
           num_heads,
           attention_dropout,
@@ -42,6 +43,7 @@ class Attention(tf.layers.Layer):
 
     super(Attention, self).__init__()
     self.hidden_size = hidden_size
+    self.adim_size = adim_size
     self.pdim_size = pdim_size
     self.num_heads = num_heads
     self.attention_dropout = attention_dropout

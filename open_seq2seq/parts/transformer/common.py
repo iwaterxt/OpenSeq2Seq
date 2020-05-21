@@ -94,7 +94,7 @@ class PrePostProcessingWrapper(object):
       self.norm = Transformer_BatchNorm(training=training,
                                         params=self.norm_params)
     else:
-      self.norm = LayerNormalization(hidden_size=params["hidden_size"],
+      self.norm = LayerNormalization(hidden_size=params["adim_size"],
                                      params=self.norm_params)
 
   def __call__(self, x, *args, **kwargs):

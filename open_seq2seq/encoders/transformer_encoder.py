@@ -126,6 +126,7 @@ class TransformerEncoder(Encoder):
         # Create sublayers for each layer.
         self_attention_layer = attention_layer.SelfAttention(
           hidden_size=self.params["hidden_size"],
+          adim_size=self.params["adim_size"],
           pdim_size = self.params["pdim_size"],
           num_heads=self.params["num_heads"],
           attention_dropout=self.params["attention_dropout"],
